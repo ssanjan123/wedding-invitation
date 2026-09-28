@@ -45,8 +45,7 @@
     weekday: start.toLocaleDateString('en-GB', { weekday: 'long' }),
     monthYear: start.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }),
     dateShort: start.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }),
-    timeWords: timeInWords(start),
-    rsvpBy: 'Kindly reply by ' + parseLocal(C.rsvp.by).toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })
+    timeWords: timeInWords(start)
   };
   derived.whenShort = derived.weekday + ' ' + derived.dateShort + ', ' + clock(start);
 
@@ -83,6 +82,11 @@
     else list.innerHTML = C.schedule.map(function (s) {
       return '<li><time>' + esc(s.time) + '</time><i aria-hidden="true"></i><span>' + esc(s.item) + '</span></li>';
     }).join('');
+
+    var message = $('[data-message]');
+    if (C.message && C.message.length) {
+      message.innerHTML = C.message.map(function (m) { return '<p>' + esc(m) + '</p>'; }).join('');
+    }
 
     calendarLinks();
   }
@@ -228,7 +232,7 @@
     }
     function spawn(p, top) {
       p.img = imgs[(Math.random() * imgs.length) | 0];
-      p.s = 14 + Math.random() * 20;
+      p.s = 12 + Math.random() * 16;
       p.x = Math.random() * W;
       p.y = top ? -40 - Math.random() * H * 0.3 : Math.random() * H;
       p.vy = 28 + Math.random() * 42;
@@ -243,7 +247,7 @@
     }
     size();
     addEventListener('resize', size);
-    var count = innerWidth < 700 ? 24 : 60;
+    var count = innerWidth < 700 ? 16 : 34;
     for (var i = 0; i < count; i++) parts.push(spawn({}, false));
 
     function frame(now) {
@@ -311,7 +315,7 @@
     gsap.ticker.lagSmoothing(0);
     lenis.stop();
 
-    var TOTAL = 13;      // timeline length in units
+    var TOTAL = 13.6;    // timeline length in units
     var UNIT = 0.5;      // viewport heights of scrolling per unit
 
     var env = $('.envelope'), envFloat = $('.env-float'), card = $('.card'), cardInner = $('.card__inner');
@@ -427,7 +431,19 @@
       .from(vCard, { autoAlpha: 0, y: 50, ease: 'power2.out', duration: 0.6 }, 11.2)
       .fromTo(line, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.9 }, 11.5)
       .from(items, { autoAlpha: 0, duration: 0.3, stagger: 0.22 }, 11.55)
+      // the ivory blessings page rises over the film from 13.0 (it overlaps the stage by 30vh)
+      .to(vCard, { autoAlpha: 0, y: -30, ease: 'power2.in', duration: 0.4 }, 13.0)
       .set({}, {}, TOTAL);
+
+    /* Page 4: the blessing is written in, right to left, as the page arrives */
+    gsap.fromTo('.calligraphy__text', { '--reveal': 0 }, {
+      '--reveal': 1, ease: 'none',
+      scrollTrigger: { trigger: '.calligraphy', start: 'top 88%', end: 'top 38%', scrub: debug ? true : 0.6 }
+    });
+    gsap.fromTo('.calligraphy__halo', { rotation: -35 }, {
+      rotation: 35, ease: 'none',
+      scrollTrigger: { trigger: '.blessing', start: 'top bottom', end: 'bottom top', scrub: true }
+    });
 
     // scroll progress line
     var bar = $('.progress span');
@@ -477,19 +493,14 @@
   var M = window.InviteMedia;
   var media = {
     velvet: M.Loop($('.velvet__video')),
-    night: M.Loop($('.night__video')),
     venue: M.Scrub($('.film__video')),
     dust: { setLevel: function () {} }
   };
 
-  new IntersectionObserver(function (entries) {
-    media.night.setActive(entries[0].isIntersecting);
-  }, { rootMargin: '50% 0px' }).observe($('.rsvp'));
-
   var controller = null;
   if (motion) {
     media.dust = Dust($('.dust'));
-    Petals($('.petals'), $('.rsvp'));
+    Petals($('.petals'), $('.blessing'));
     controller = buildMotion(media);
   }
 

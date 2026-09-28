@@ -21,7 +21,7 @@
   <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Imperial+Script&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Imperial+Script&display=swap">
   <link rel="preload" as="image" href="assets/img/seal.webp">
   <link rel="preload" as="image" href="assets/img/env-paper.webp">
   <link rel="stylesheet" href="css/style.css">
@@ -195,37 +195,40 @@
       </section>
     </div>
 
-    <!-- Page 4: reply -->
-    <section class="rsvp" id="rsvp" aria-labelledby="rsvp-title">
-      <div class="night">
-        <picture class="night__poster">
-          <source media="(orientation: portrait)" srcset="assets/img/night-port.jpg">
-          <img src="assets/img/night-land.jpg" alt="" loading="lazy">
-        </picture>
-        <video class="night__video" muted playsinline loop preload="none" disablepictureinpicture
-               data-land="assets/film/night-land.mp4" data-port="assets/film/night-port.mp4"></video>
-        <div class="night__shade"></div>
-      </div>
+    <!-- Page 4: blessings -->
+    <section class="blessing" id="blessing" aria-labelledby="blessing-arabic">
       <canvas class="petals" aria-hidden="true"></canvas>
+      <img class="blessing__floral blessing__floral--l" src="assets/img/florals-a.webp" alt="" loading="lazy">
+      <img class="blessing__floral blessing__floral--r" src="assets/img/florals-a.webp" alt="" loading="lazy">
 
-      <div class="rsvp__content">
-        <div class="crest crest--rsvp">
-          <img src="assets/img/crest-small.webp" alt="" loading="lazy">
+      <div class="blessing__content">
+        <div class="crest crest--blessing">
+          <img src="assets/img/crest.webp" alt="" loading="lazy">
           <span class="monogram" data-initials>A&amp;R</span>
         </div>
-        <h2 class="rsvp__title" id="rsvp-title" data-bind="rsvp.title">We would be honoured by your presence</h2>
-        <p class="rsvp__by" data-bind="rsvpBy">Kindly reply by 15 November</p>
-        <div class="rsvp__actions">
-          <a class="btn btn--gold" data-href="rsvp.url" href="#" target="_blank" rel="noopener">Send your reply</a>
-          <a class="btn btn--ghost" data-ics href="#" download="wedding.ics">Add to calendar</a>
+        <div class="calligraphy">
+          <img class="calligraphy__halo" src="assets/img/mandala.webp" alt="" loading="lazy">
+          <h2 class="calligraphy__text" id="blessing-arabic" lang="ar" dir="rtl" data-bind="blessing.arabic">بَارَكَ اللَّهُ لَكُمَا وَبَارَكَ عَلَيْكُمَا
+وَجَمَعَ بَيْنَكُمَا فِي خَيْرٍ</h2>
         </div>
-        <p class="rsvp__alt"><a data-gcal href="#" target="_blank" rel="noopener">Or add it to Google Calendar</a></p>
+        <p class="blessing__translation" data-bind="blessing.translation">May Allah bless you both, shower His blessings upon you, and unite you in goodness.</p>
+        <div class="rule" aria-hidden="true"><i></i></div>
+        <div class="message" data-message>
+          <p>Our story began with our families, and it continues with you. Every prayer, every kind word and every shared meal has helped bring us to this day.</p>
+          <p>As we begin our life together, we ask for your duas for barakah, patience and a home full of mercy, and we would be honoured to celebrate it with you.</p>
+        </div>
+        <p class="signoff" data-bind="signoff">With love,</p>
+        <p class="signoff__names" data-bind="namesShort">Aria &amp; Rayan</p>
+        <p class="signoff__families" data-bind="families">and their families</p>
+        <p class="save-date">
+          <a data-ics href="#" download="wedding.ics">Add to your calendar</a>
+          <i aria-hidden="true"></i>
+          <a data-gcal href="#" target="_blank" rel="noopener">Add to Google Calendar</a>
+        </p>
       </div>
 
-      <footer class="closing">
-        <img class="closing__spray" src="assets/img/spray.webp" alt="" loading="lazy">
-        <p class="closing__text" data-bind="closing">With love and blessings from our families</p>
-        <p class="closing__names" data-bind="namesShort">Aria &amp; Rayan</p>
+      <footer class="blessing__footer">
+        <img src="assets/img/spray.webp" alt="" loading="lazy">
       </footer>
     </section>
   </main>

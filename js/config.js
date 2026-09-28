@@ -38,14 +38,19 @@ window.INVITE = {
     { time: "8:30 pm", item: "Dinner and celebration" }
   ],
 
-  rsvp: {
-    // A Google Form, a WhatsApp link (https://wa.me/15551234567) or mailto:you@example.com
-    url: "https://forms.gle/your-form-link",
-    by: "2026-11-15",
-    title: "We would be honoured by your presence"
+  // Last page: a blessing in Arabic calligraphy (\n starts a new line) and its meaning.
+  blessing: {
+    arabic: "بَارَكَ اللَّهُ لَكُمَا وَبَارَكَ عَلَيْكُمَا\nوَجَمَعَ بَيْنَكُمَا فِي خَيْرٍ",
+    translation: "May Allah bless you both, shower His blessings upon you, and unite you in goodness."
   },
 
-  closing: "With love and blessings from our families",
+  // A note from the couple. Each item is one paragraph.
+  message: [
+    "Our story began with our families, and it continues with you. Every prayer, every kind word and every shared meal has helped bring us to this day.",
+    "As we begin our life together, we ask for your duas for barakah, patience and a home full of mercy, and we would be honoured to celebrate it with you."
+  ],
+  signoff: "With love,",
+  families: "and their families",
 
   // Optional. Put an .mp3 at this path and a music button appears; otherwise it stays hidden.
   musicUrl: "assets/audio/music.mp3"

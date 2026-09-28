@@ -1,10 +1,12 @@
 # Wedding invitation
 
 A scroll-animated invitation: a sealed envelope opens, the invitation unfolds inside a palace arch,
-the arch becomes a doorway into a film of the venue, and the page ends with the reply buttons.
+the arch becomes a doorway into a film of the venue, and the page ends on a light ivory page with a
+blessing in Arabic calligraphy and a note from the couple.
 
 ## Change the details
-Edit `js/config.js`: names, initials, date and time, venue, schedule, RSVP link and closing line.
+Edit `js/config.js`: names, initials, date and time, venue, schedule, the Arabic blessing and its
+meaning, and the note from the couple (`message`, one entry per paragraph).
 The weekday, "six o'clock in the evening", the countdown and the calendar file are all worked out from `start`.
 
 Link previews (WhatsApp, iMessage) read the `<meta>` tags at the top of `index.html`, so update the
