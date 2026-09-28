@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Aria &amp; Rayan are getting married</title>
+  <meta name="description" content="You are invited to the wedding of Aria and Rayan on Saturday 12 December 2026 at Rosewood Palace Gardens.">
+  <meta name="theme-color" content="#2A060C">
+
+  <!-- Link previews read these tags, not js/config.js: update the names and date here too. -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://ssanjan123.github.io/wedding-invitation/">
+  <meta property="og:title" content="Aria &amp; Rayan are getting married">
+  <meta property="og:description" content="Saturday 12 December 2026, Rosewood Palace Gardens. Open your invitation.">
+  <meta property="og:image" content="https://ssanjan123.github.io/wedding-invitation/assets/img/og-share.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" type="image/png" href="assets/img/favicon.png">
+  <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Imperial+Script&display=swap">
+  <link rel="preload" as="image" href="assets/img/seal.webp">
+  <link rel="preload" as="image" href="assets/img/env-paper.webp">
+  <link rel="stylesheet" href="css/style.css">
+  <script>document.documentElement.classList.add('js', matchMedia('(prefers-reduced-motion: reduce)').matches ? 'still' : 'motion');</script>
+</head>
+<body>
+
+  <div class="preloader" aria-hidden="true">
+    <div class="crest crest--loader">
+      <img src="assets/img/crest-small.webp" alt="">
+      <span class="monogram" data-initials>A&amp;R</span>
+    </div>
+    <svg class="preloader__ring" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" pathLength="1"/></svg>
+  </div>
+
+  <div class="progress" aria-hidden="true"><span></span></div>
+  <canvas class="dust" aria-hidden="true"></canvas>
+
+  <div class="controls">
+    <button class="skip" type="button">Skip to the invitation</button>
+    <button class="music" type="button" aria-pressed="false" hidden>
+      <span class="sr-only">Play music</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path class="music__on" d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/><path class="music__off" d="M4 4l16 16"/></svg>
+    </button>
+  </div>
+
+  <main>
+    <div class="stage">
+
+      <!-- Page 3: the venue film (bottom layer) -->
+      <section class="scene scene--venue" id="venue" aria-labelledby="venue-name">
+        <div class="film">
+          <picture class="film__poster">
+            <source media="(orientation: portrait)" srcset="assets/img/venue-port.jpg">
+            <img src="assets/img/venue-land.jpg" alt="The palace gate at dusk, lined with lanterns and marigold garlands">
+          </picture>
+          <picture class="film__poster film__poster--end" aria-hidden="true">
+            <source media="(orientation: portrait)" srcset="assets/img/venue-end-port.jpg">
+            <img src="assets/img/venue-end-land.jpg" alt="" loading="lazy">
+          </picture>
+          <video class="film__video" muted playsinline preload="none" disablepictureinpicture
+                 data-land="assets/film/venue-land.mp4" data-port="assets/film/venue-port.mp4"></video>
+          <div class="film__shade"></div>
+        </div>
+
+        <div class="venue-title">
+          <p class="venue-title__lead" data-bind="venue.lead">The celebration will be held at</p>
+          <h2 class="venue-title__name" id="venue-name" data-bind="venue.name">Rosewood Palace Gardens</h2>
+        </div>
+
+        <div class="venue-card">
+          <p class="venue-card__name" data-bind="venue.name">Rosewood Palace Gardens</p>
+          <p class="venue-card__address" data-bind="venue.address">Palace Road, Old City</p>
+          <p class="venue-card__when" data-bind="whenShort">Saturday 12 December 2026, 6 pm</p>
+          <a class="btn btn--ghost" data-href="venue.mapsUrl" href="#" target="_blank" rel="noopener">Get directions</a>
+          <div class="evening">
+            <svg class="evening__line" viewBox="0 0 2 100" preserveAspectRatio="none" aria-hidden="true"><line x1="1" y1="0" x2="1" y2="100" pathLength="1"/></svg>
+            <ol class="evening__list"></ol>
+          </div>
+        </div>
+      </section>
+
+      <!-- Page 2: the invitation -->
+      <section class="scene scene--invite" id="invitation" aria-label="Invitation">
+        <div class="invite-bg"></div>
+
+        <div class="portal">
+          <div class="arch-box portal__frame">
+            <div class="portal__paper"></div>
+            <img class="arch" src="assets/img/arch.webp" alt="" width="1360" height="2048">
+            <img class="spray" src="assets/img/spray.webp" alt="" loading="lazy">
+            <div class="opening">
+              <div class="invite-a">
+                <div class="crest crest--invite">
+                  <img src="assets/img/crest.webp" alt="">
+                  <span class="monogram" data-initials>A&amp;R</span>
+                </div>
+                <p class="hosts" data-bind="hosts">Together with their families</p>
+                <h1 class="names">
+                  <span class="names__one" data-bind="couple.first">Aria</span>
+                  <span class="names__amp">&amp;</span>
+                  <span class="names__two" data-bind="couple.second">Rayan</span>
+                </h1>
+                <p class="request" data-bind="request">request the honour of your presence at their wedding</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="arch-box date-box">
+          <div class="invite-b">
+            <p class="names-small" aria-hidden="true" data-bind="namesShort">Aria &amp; Rayan</p>
+            <div class="date">
+              <img class="mandala" src="assets/img/mandala.webp" alt="" loading="lazy">
+              <p class="date__weekday" data-bind="weekday">Saturday</p>
+              <p class="date__day"><span class="sr-only" data-day>12</span><span class="date__digits" aria-hidden="true"></span></p>
+              <p class="date__month" data-bind="monthYear">December 2026</p>
+              <p class="date__time" data-bind="timeWords">at six o’clock in the evening</p>
+            </div>
+            <p class="countdown"></p>
+          </div>
+        </div>
+
+        <img class="floral floral--bl" src="assets/img/florals-a.webp" alt="" loading="lazy">
+        <img class="floral floral--br" src="assets/img/florals-a.webp" alt="" loading="lazy">
+        <img class="floral floral--tl" src="assets/img/florals-b.webp" alt="" loading="lazy">
+        <img class="floral floral--tr" src="assets/img/florals-b.webp" alt="" loading="lazy">
+        <img class="garland garland--1" src="assets/img/garland.webp" alt="" loading="lazy">
+        <img class="garland garland--2" src="assets/img/garland.webp" alt="" loading="lazy">
+        <img class="garland garland--3" src="assets/img/garland.webp" alt="" loading="lazy">
+        <img class="garland garland--4" src="assets/img/garland.webp" alt="" loading="lazy">
+      </section>
+
+      <!-- Page 1: the sealed envelope (top layer) -->
+      <section class="scene scene--envelope" id="envelope" aria-label="Your invitation, sealed">
+        <div class="velvet">
+          <picture class="velvet__poster">
+            <source media="(orientation: portrait)" srcset="assets/img/velvet-port.jpg">
+            <img src="assets/img/velvet-land.jpg" alt="">
+          </picture>
+          <video class="velvet__video" muted playsinline loop preload="none" disablepictureinpicture
+                 data-land="assets/film/velvet-land.mp4" data-port="assets/film/velvet-port.mp4"></video>
+          <div class="velvet__shade"></div>
+        </div>
+
+        <div class="env-float">
+          <div class="envelope">
+            <div class="env-inside"></div>
+            <div class="card">
+              <div class="card__inner">
+                <div class="crest crest--card">
+                  <img src="assets/img/crest.webp" alt="">
+                  <span class="monogram" data-initials>A&amp;R</span>
+                </div>
+                <p class="card__names" data-bind="namesShort">Aria &amp; Rayan</p>
+                <p class="card__date" data-bind="dateShort">12 December 2026</p>
+              </div>
+            </div>
+            <div class="env-pocket">
+              <div class="env-pocket__shade env-pocket__shade--l"></div>
+              <div class="env-pocket__shade env-pocket__shade--r"></div>
+              <div class="env-pocket__shade env-pocket__shade--b"></div>
+              <svg class="env-seams" viewBox="0 0 100 66" preserveAspectRatio="none" aria-hidden="true">
+                <polyline points="0,0.4 50,36.3 100,0.4"/>
+                <line x1="0.5" y1="65.6" x2="50" y2="36.3"/>
+                <line x1="99.5" y1="65.6" x2="50" y2="36.3"/>
+                <rect x="1.4" y="1.4" width="97.2" height="63.2"/>
+              </svg>
+              <p class="guest" data-guest>For you &amp; your family</p>
+            </div>
+            <div class="env-flap-shadow"></div>
+            <div class="env-flap">
+              <div class="env-flap__out">
+                <svg viewBox="0 0 100 58" preserveAspectRatio="none" aria-hidden="true"><polyline points="1.5,1.2 50,55.5 98.5,1.2"/></svg>
+              </div>
+              <div class="env-flap__in"></div>
+            </div>
+            <div class="seal">
+              <div class="seal__half seal__half--l"><img src="assets/img/seal.webp" alt=""><span class="seal__initials" data-initials>A&amp;R</span></div>
+              <div class="seal__half seal__half--r"><img src="assets/img/seal.webp" alt=""><span class="seal__initials" data-initials>A&amp;R</span></div>
+            </div>
+            <div class="burst" aria-hidden="true"></div>
+          </div>
+          <div class="env-shadow"></div>
+        </div>
+
+        <p class="scroll-cue" aria-hidden="true">
+          <span>Scroll to open</span>
+          <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+        </p>
+      </section>
+    </div>
+
+    <!-- Page 4: reply -->
+    <section class="rsvp" id="rsvp" aria-labelledby="rsvp-title">
+      <div class="night">
+        <picture class="night__poster">
+          <source media="(orientation: portrait)" srcset="assets/img/night-port.jpg">
+          <img src="assets/img/night-land.jpg" alt="" loading="lazy">
+        </picture>
+        <video class="night__video" muted playsinline loop preload="none" disablepictureinpicture
+               data-land="assets/film/night-land.mp4" data-port="assets/film/night-port.mp4"></video>
+        <div class="night__shade"></div>
+      </div>
+      <canvas class="petals" aria-hidden="true"></canvas>
+
+      <div class="rsvp__content">
+        <div class="crest crest--rsvp">
+          <img src="assets/img/crest-small.webp" alt="" loading="lazy">
+          <span class="monogram" data-initials>A&amp;R</span>
+        </div>
+        <h2 class="rsvp__title" id="rsvp-title" data-bind="rsvp.title">We would be honoured by your presence</h2>
+        <p class="rsvp__by" data-bind="rsvpBy">Kindly reply by 15 November</p>
+        <div class="rsvp__actions">
+          <a class="btn btn--gold" data-href="rsvp.url" href="#" target="_blank" rel="noopener">Send your reply</a>
+          <a class="btn btn--ghost" data-ics href="#" download="wedding.ics">Add to calendar</a>
+        </div>
+        <p class="rsvp__alt"><a data-gcal href="#" target="_blank" rel="noopener">Or add it to Google Calendar</a></p>
+      </div>
+
+      <footer class="closing">
+        <img class="closing__spray" src="assets/img/spray.webp" alt="" loading="lazy">
+        <p class="closing__text" data-bind="closing">With love and blessings from our families</p>
+        <p class="closing__names" data-bind="namesShort">Aria &amp; Rayan</p>
+      </footer>
+    </section>
+  </main>
+
+  <script src="vendor/gsap.min.js"></script>
+  <script src="vendor/ScrollTrigger.min.js"></script>
+  <script src="vendor/lenis.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/media.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
