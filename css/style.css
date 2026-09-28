@@ -103,7 +103,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   transition: opacity 1s ease, visibility 0s linear 1s;
 }
 .preloader > * { grid-area: 1 / 1; }
-.crest--loader { width: 118px; }
+.crest--loader { width: 136px; }
 .preloader__ring { width: 196px; height: 196px; rotate: -90deg; }
 .preloader__ring circle {
   fill: none; stroke: var(--gold-500); stroke-width: .5; opacity: .9;
@@ -293,8 +293,9 @@ html:not(.motion) .skip { display: none; }
 }
 
 .seal {
+  --seal: 23;                                   /* width as % of the envelope */
   position: absolute; z-index: 7;
-  width: 23%; left: 38.5%; top: calc(58% - 16.5cqw);
+  width: calc(var(--seal) * 1cqw); left: calc(50% - var(--seal) * .5cqw); top: calc(58% - var(--seal) * .717cqw);
   aspect-ratio: 560 / 596;
   filter: drop-shadow(0 6px 8px rgba(0, 0, 0, .45));
 }
@@ -308,11 +309,16 @@ html:not(.motion) .skip { display: none; }
   filter: drop-shadow(0 1px 0 rgba(0, 0, 0, .55));
 }
 
-.burst { position: absolute; left: 50%; top: calc(58% - 4.2cqw); width: 0; height: 0; z-index: 8; pointer-events: none; }
+.burst { --seal: 23; position: absolute; left: 50%; top: calc(58% - var(--seal) * .185cqw); width: 0; height: 0; z-index: 8; pointer-events: none; }
 .burst i {
   position: absolute; width: 5px; height: 5px; margin: -2.5px; border-radius: 50%;
   background: radial-gradient(circle, #FFF1C1, #C9A24B 60%, transparent 70%);
   opacity: 0;
+}
+
+@container (max-width: 480px) {
+  .seal, .burst { --seal: 29; }
+  .crest--card { width: 50%; }
 }
 
 .scroll-cue {
@@ -367,7 +373,15 @@ html:not(.motion) .scene--invite { padding: 6svh 0 4svh; }
 }
 .invite-a { display: flex; flex-direction: column; align-items: center; gap: 2cqw; }
 .crest--invite { width: 30cqw; }
+@container (max-width: 520px) { .crest--invite { width: 43cqw; } }
 .monogram small, .seal__initials small { font-size: .62em; margin: 0 .04em; }
+/* once js/main.js has measured them, each letter is placed individually around the medallion centre */
+.monogram.is-fitted, .seal__initials.is-fitted { position: relative; width: 0; height: 0; padding: 0; translate: none; background: none; }
+.is-fitted > i { position: absolute; font-style: normal; line-height: 1; white-space: nowrap; }
+.seal__initials.is-fitted > i {
+  background-image: var(--foil); background-size: 200% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
 .hosts, .request { font-style: italic; font-size: max(14px, 4.3cqw); line-height: 1.35; color: var(--maroon-700); }
 .request { max-width: 60cqw; text-wrap: balance; }
 .names { display: flex; flex-direction: column; align-items: center; margin: 0; font-weight: 400; line-height: .95; }
@@ -542,7 +556,7 @@ html:not(.motion) .scene--venue { min-height: 100svh; }
   width: 100%; max-width: 38rem;
   display: flex; flex-direction: column; align-items: center;
 }
-.crest--blessing { width: min(230px, 58vw); container-type: inline-size; }
+.crest--blessing { width: min(250px, 64vw); container-type: inline-size; }
 .crest--blessing .monogram { --mono-size: 10.5cqw; --mono-y: 3%; }
 
 /* later blocks are positioned so they paint above the calligraphy's medallion halo */

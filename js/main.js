@@ -125,29 +125,41 @@
   /* Initials sit in round medallions whose size and centre differ per emblem, and the script's
      swashes (the A especially) make the letters' box lopsided. Measure the actual ink, then size
      and shift it so it sits centred with a clear margin inside the medallion. */
-  var MEDALLIONS = {                      // centre and inner width as fractions of the emblem image
-    crest: { cx: 0.5, cy: 0.517, w: 0.231, ar: 632 / 900, fill: 0.72 },
-    'crest-small': { cx: 0.498, cy: 0.503, w: 0.412, ar: 698 / 520 },
-    seal: { cx: 0.499, cy: 0.467, w: 0.466, ar: 596 / 560 }
+  var MEDALLIONS = {                      // centre and inner size as fractions of the emblem's width
+    crest: { cx: 0.5, cy: 0.517, w: 0.231, ar: 632 / 900, fill: 0.95 },
+    'crest-small': { cx: 0.498, cy: 0.503, w: 0.412, h: 0.557, ar: 698 / 520, fill: 0.9 },
+    seal: { cx: 0.499, cy: 0.467, w: 0.466, ar: 596 / 560, fill: 0.92 }
   };
+  // 'row' = W&A side by side; 'stack' = W upper left, A lower right (rounder, larger but less legible)
+  var MONO_LAYOUT = 'row';
   var inkCtx;
-  function inkOf(ini, px, family) {
+  function glyph(ch, px, family) {
     inkCtx = inkCtx || document.createElement('canvas').getContext('2d');
-    var parts = [[ini[0], 1, 0], ['&', 0.62, 0.04], [ini[1], 1, 0]];   // mirrors "W<small>&</small>A"
-    var x = 0, L = 1e9, R = -1e9, T = 1e9, B = -1e9, asc = 0, desc = 0;
-    parts.forEach(function (part) {
-      var size = px * part[1];
-      inkCtx.font = size + 'px ' + family;
-      var m = inkCtx.measureText(part[0]);
-      x += part[2] * size;
-      L = Math.min(L, x - m.actualBoundingBoxLeft);
-      R = Math.max(R, x + m.actualBoundingBoxRight);
-      T = Math.min(T, -m.actualBoundingBoxAscent);
-      B = Math.max(B, m.actualBoundingBoxDescent);
-      if (part[1] === 1) { asc = m.fontBoundingBoxAscent || px * 0.8; desc = m.fontBoundingBoxDescent || px * 0.2; }
-      x += m.width + part[2] * size;
+    inkCtx.font = px + 'px ' + family;
+    var m = inkCtx.measureText(ch), asc = m.fontBoundingBoxAscent || px * 0.8, desc = m.fontBoundingBoxDescent || px * 0.2;
+    // box top-left -> baseline origin for an element with line-height: 1
+    var base = (px - asc - desc) / 2 + asc;
+    return { ch: ch, px: px, adv: m.width, base: base,
+      l: -m.actualBoundingBoxLeft, r: m.actualBoundingBoxRight, t: -m.actualBoundingBoxAscent, b: m.actualBoundingBoxDescent };
+  }
+  function monogramLayout(ini, family) {
+    var R = 100, a = glyph(ini[0], R, family), amp = glyph('&', R * 0.6, family), b = glyph(ini[1], R, family);
+    var aw = a.r - a.l, ah = a.b - a.t, bw = b.r - b.l, bh = b.b - b.t;
+    var pos = [];   // [glyph, originX, originY] with origins on the baseline
+    if (MONO_LAYOUT === 'row') {
+      pos = [[a, 0, 0], [amp, a.adv + 4, 0], [b, a.adv + amp.adv + 8, 0]];
+    } else {
+      var ax = -a.l, ay = -a.t;                           // W's ink starts at (0, 0)
+      var bx = aw * 0.5 - b.l, by = ah * 0.62 - b.t;      // A's ink starts half across, lower down
+      var cx = (aw * 0.5 + aw) / 2 + 2, cy = (ah * 0.62 + ah) / 2 - 4;   // & sits where the two meet
+      pos = [[a, ax, ay], [b, bx, by], [amp, cx - (amp.l + amp.r) / 2, cy - (amp.t + amp.b) / 2]];
+    }
+    var L = 1e9, Rr = -1e9, T = 1e9, B = -1e9;
+    pos.forEach(function (p) {
+      L = Math.min(L, p[1] + p[0].l); Rr = Math.max(Rr, p[1] + p[0].r);
+      T = Math.min(T, p[2] + p[0].t); B = Math.max(B, p[2] + p[0].b);
     });
-    return { L: L, R: R, T: T, B: B, adv: x, asc: asc, desc: desc };
+    return { pos: pos, L: L, R: Rr, T: T, B: B, ref: R };
   }
   function fitMonograms() {
     var ini = C.couple.initials || [C.couple.first[0], C.couple.second[0]];
@@ -156,17 +168,22 @@
       if (!host) return;
       var kind = host.classList.contains('seal__half') ? 'seal'
         : /crest-small/.test(host.querySelector('img').getAttribute('src')) ? 'crest-small' : 'crest';
-      var med = MEDALLIONS[kind], W = host.offsetWidth, H = W * med.ar, D = med.w * W;
+      var med = MEDALLIONS[kind], W = host.offsetWidth;
       if (!W) return;
-      var REF = 100, ink = inkOf(ini, REF, getComputedStyle(el).fontFamily);
-      var fill = med.fill || 0.62;                                                  // share of the medallion the ink may cover
-      var k = Math.min(fill * D / (ink.R - ink.L), fill * 0.8 * D / (ink.B - ink.T));
-      var px = REF * k;
-      var baseline = (px - (ink.asc + ink.desc) * k) / 2 + ink.asc * k;          // line-height: 1
-      var dx = med.cx * W - W / 2 - ((ink.L + ink.R) / 2 * k - ink.adv * k / 2);
-      var dy = med.cy * H - H / 2 - (baseline + (ink.T + ink.B) / 2 * k - px / 2);
-      el.style.fontSize = px.toFixed(2) + 'px';
-      el.style.translate = dx.toFixed(2) + 'px ' + dy.toFixed(2) + 'px';
+      var H = W * med.ar, dw = med.w * W * med.fill, dh = (med.h || med.w) * W * med.fill;
+      var lay = monogramLayout(ini, getComputedStyle(el).fontFamily);
+      var w = lay.R - lay.L, h = lay.B - lay.T;
+      // largest scale whose ink box still has its corners inside the medallion's ellipse
+      var k = 1 / Math.sqrt(Math.pow(w / dw, 2) + Math.pow(h / dh, 2));
+      // offset from the emblem's centre (where the zero-size monogram box sits) to the medallion's centre
+      var ox = med.cx * W - W / 2 - (lay.L + w / 2) * k, oy = med.cy * H - H / 2 - (lay.T + h / 2) * k;
+      el.classList.add('is-fitted');
+      el.style.translate = '';
+      el.innerHTML = lay.pos.map(function (p) {
+        var g = p[0], s = g.px * k;
+        return '<i style="font-size:' + s.toFixed(2) + 'px;left:' + (ox + p[1] * k).toFixed(2) + 'px;top:' +
+          (oy + (p[2] - g.base) * k).toFixed(2) + 'px">' + esc(g.ch) + '</i>';
+      }).join('');
     });
   }
 
