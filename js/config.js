@@ -9,9 +9,12 @@
 */
 window.INVITE = {
   couple: {
-    first: "Aria",
-    second: "Rayan",
-    initials: ["A", "R"]
+    // first names: seal, card, signature; full names: the invitation page
+    first: "Wahid",
+    second: "Anushka",
+    firstFull: "Wahid Sanjan",
+    secondFull: "Anushka Shahreen",
+    initials: ["W", "A"]
   },
 
   // Written on the envelope when the link has no ?to= name.
@@ -20,23 +23,22 @@ window.INVITE = {
   hosts: "Together with their families",
   request: "request the honour of your presence at their wedding",
 
-  // Local time at the venue, 24-hour clock.
-  start: "2026-12-12T18:00",
-  end: "2026-12-12T23:30",
+  // Local time at the venue, 24-hour clock. The start time is still a placeholder.
+  start: "2026-12-27T18:00",
+  end: "2026-12-27T23:00",
+  // Bangladesh time, so the countdown and calendar are right for guests anywhere
+  utcOffset: "+06:00",
 
   venue: {
     lead: "The celebration will be held at",
-    name: "Rosewood Palace Gardens",
-    address: "Palace Road, Old City",
-    mapsUrl: "https://www.google.com/maps/search/?api=1&query=Rosewood+Palace+Gardens"
+    name: "BAF Shaheen Hall",
+    address: "Airport Road, beside Jahangir Gate, Dhaka Cantonment, Dhaka 1206",
+    mapsUrl: "https://www.google.com/maps/search/?api=1&query=BAF+Shaheen+Hall%2C+Airport+Road%2C+Dhaka+Cantonment%2C+Dhaka"
   },
 
   // Shown on the venue card. Leave the list empty to hide it.
-  schedule: [
-    { time: "6:00 pm", item: "Guests arrive" },
-    { time: "7:00 pm", item: "Wedding ceremony" },
-    { time: "8:30 pm", item: "Dinner and celebration" }
-  ],
+  // e.g. { time: "7:00 pm", item: "Dinner" }
+  schedule: [],
 
   // Last page: a blessing in Arabic calligraphy (\n starts a new line) and its meaning.
   blessing: {

@@ -375,7 +375,7 @@ html:not(.motion) .scene--invite { padding: 6svh 0 4svh; }
 .names { display: flex; flex-direction: column; align-items: center; margin: 0; font-weight: 400; line-height: .95; }
 .names__one, .names__two {
   display: inline-block;
-  font-family: var(--script); font-size: 13cqw; color: var(--ink);
+  font-family: var(--script); font-size: 13cqw; color: var(--ink); white-space: nowrap;
   padding: .12em .35em; margin: -.12em -.35em;
   -webkit-mask-image: linear-gradient(90deg, #000 calc(var(--reveal) * 130% - 30%), transparent calc(var(--reveal) * 130%));
   mask-image: linear-gradient(90deg, #000 calc(var(--reveal) * 130% - 30%), transparent calc(var(--reveal) * 130%));
@@ -396,7 +396,7 @@ html:not(.motion) .scene--invite { padding: 6svh 0 4svh; }
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.4cqw;
   text-align: center;
 }
-.names-small { font-family: var(--script); font-size: 8cqw; line-height: 1.2; color: var(--ink); padding: 0 .3em; }
+.names-small { font-family: var(--script); font-size: 7cqw; line-height: 1.2; color: var(--ink); padding: 0 .3em; white-space: nowrap; }
 .date { position: relative; display: flex; flex-direction: column; align-items: center; padding: 3cqw 0; }
 .mandala {
   position: absolute; left: 50%; top: 50%; width: 92cqw; max-width: none; height: auto; aspect-ratio: 760 / 753;
@@ -493,7 +493,7 @@ html:not(.motion) .floral--tl, html:not(.motion) .floral--tr, html:not(.motion) 
   -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
 }
 .venue-card__name { font-size: clamp(24px, 3vw, 30px); font-weight: 500; color: var(--gold-300); line-height: 1.2; }
-.venue-card__address { margin-top: 4px; font-size: 18px; color: var(--ivory); opacity: .9; }
+.venue-card__address { margin-top: 4px; font-size: 18px; color: var(--ivory); opacity: .9; text-wrap: balance; }
 .venue-card__when { margin-top: 2px; font-style: italic; font-size: 18px; color: var(--ivory); opacity: .9; }
 .venue-card .btn { margin-top: 16px; }
 

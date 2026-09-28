@@ -16,13 +16,24 @@
 
   /* ---------------------------------------------------------------- dates */
   function pad(n) { return String(n).padStart(2, '0'); }
-  function parseLocal(s) {
+  // Wall-clock time at the venue, held in the UTC fields so it reads the same in every viewer's time zone
+  function venueTime(s) {
     var parts = String(s).split('T'), d = parts[0].split('-').map(Number), t = (parts[1] || '00:00').split(':').map(Number);
-    return new Date(d[0], d[1] - 1, d[2], t[0] || 0, t[1] || 0);
+    return new Date(Date.UTC(d[0], d[1] - 1, d[2], t[0] || 0, t[1] || 0));
+  }
+  // The real moment, for the countdown and calendar. Without utcOffset, the guest's own clock is used.
+  var OFFSET = (function (o) {
+    var m = /^([+-])(\d{2}):?(\d{2})$/.exec(o || '');
+    return m ? (m[1] === '-' ? -1 : 1) * (+m[2] * 60 + +m[3]) : null;
+  })(C.utcOffset);
+  function instant(wall) {
+    return OFFSET === null
+      ? new Date(wall.getUTCFullYear(), wall.getUTCMonth(), wall.getUTCDate(), wall.getUTCHours(), wall.getUTCMinutes())
+      : new Date(wall.getTime() - OFFSET * 60000);
   }
   var WORDS = ['twelve', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven'];
   function timeInWords(d) {
-    var h = d.getHours(), m = d.getMinutes();
+    var h = d.getUTCHours(), m = d.getUTCMinutes();
     if (h === 12 && m === 0) return 'at noon';
     var part = h < 12 ? 'in the morning' : h < 17 ? 'in the afternoon' : 'in the evening';
     var phrase = m === 0 ? WORDS[h % 12] + ' o’clock'
@@ -33,18 +44,22 @@
     return 'at ' + phrase + ' ' + part;
   }
   function clock(d) {
-    var h = d.getHours(), m = d.getMinutes();
+    var h = d.getUTCHours(), m = d.getUTCMinutes();
     return (h % 12 || 12) + (m ? ':' + pad(m) : '') + (h < 12 ? ' am' : ' pm');
   }
 
-  var start = parseLocal(C.start);
-  var end = parseLocal(C.end || C.start);
+  var start = venueTime(C.start);
+  var end = venueTime(C.end || C.start);
+  var startAt = instant(start), endAt = instant(end);
   var names = C.couple.first + ' & ' + C.couple.second;
+  var fmt = function (opts) { opts.timeZone = 'UTC'; return start.toLocaleDateString('en-GB', opts); };
   var derived = {
     namesShort: names,
-    weekday: start.toLocaleDateString('en-GB', { weekday: 'long' }),
-    monthYear: start.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }),
-    dateShort: start.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }),
+    firstFull: C.couple.firstFull || C.couple.first,
+    secondFull: C.couple.secondFull || C.couple.second,
+    weekday: fmt({ weekday: 'long' }),
+    monthYear: fmt({ month: 'long', year: 'numeric' }),
+    dateShort: fmt({ day: 'numeric', month: 'long', year: 'numeric' }),
     timeWords: timeInWords(start)
   };
   derived.whenShort = derived.weekday + ' ' + derived.dateShort + ', ' + clock(start);
@@ -74,7 +89,7 @@
     $('[data-guest]').textContent = to ? (/^for\s/i.test(to) ? to : 'For ' + to) : C.guestDefault;
 
     document.title = names + ' are getting married';
-    $('[data-day]').textContent = String(start.getDate());
+    $('[data-day]').textContent = String(start.getUTCDate());
     buildDigits();
 
     var list = $('.evening__list'), evening = $('.evening');
@@ -91,10 +106,26 @@
     calendarLinks();
   }
 
+  // Full names can be long: shrink both script lines together until the longer one fits the arch
+  function fitNames() {
+    var box = $('.opening'), els = $$('.names__one, .names__two');
+    if (!box || !els.length) return;
+    els.forEach(function (el) { el.style.fontSize = ''; });
+    var max = box.clientWidth, scale = 1;
+    els.forEach(function (el) {
+      var size = parseFloat(getComputedStyle(el).fontSize);
+      var inner = el.scrollWidth - 0.7 * size;   // without the .35em padding on each side
+      if (inner > max) scale = Math.min(scale, max / inner);
+    });
+    if (scale < 1) els.forEach(function (el) {
+      el.style.fontSize = (parseFloat(getComputedStyle(el).fontSize) * scale * 0.97).toFixed(1) + 'px';
+    });
+  }
+
   function buildDigits() {
     var holder = $('.date__digits');
     holder.innerHTML = '';
-    String(start.getDate()).split('').forEach(function (ch, i) {
+    String(start.getUTCDate()).split('').forEach(function (ch, i) {
       var target = +ch, seq = [];
       for (var k = 5 + i * 3; k >= 0; k--) seq.push((target - k + 100) % 10);
       var digit = document.createElement('span');
@@ -109,7 +140,10 @@
   }
 
   function calendarLinks() {
-    var stamp = function (d) { return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + 'T' + pad(d.getHours()) + pad(d.getMinutes()) + '00'; };
+    // with a known UTC offset the calendar gets exact UTC times; otherwise floating local times
+    var stamp = OFFSET === null
+      ? function (d) { return d.getUTCFullYear() + pad(d.getUTCMonth() + 1) + pad(d.getUTCDate()) + 'T' + pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + '00'; }
+      : function (d) { d = instant(d); return d.getUTCFullYear() + pad(d.getUTCMonth() + 1) + pad(d.getUTCDate()) + 'T' + pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + '00Z'; };
     var icsText = function (s) { return String(s).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n'); };
     var title = 'Wedding of ' + names;
     var where = C.venue.name + ', ' + C.venue.address;
@@ -139,9 +173,9 @@
     var el = $('.countdown');
     var unit = function (n, w) { return '<b>' + n + '</b> ' + w + (n === 1 ? '' : 's'); };
     function tick() {
-      var ms = start - Date.now();
+      var ms = startAt - Date.now();
       if (ms <= 0) {
-        el.textContent = Date.now() < end ? 'The celebration is happening now' : 'Thank you for celebrating with us';
+        el.textContent = Date.now() < endAt ? 'The celebration is happening now' : 'Thank you for celebrating with us';
         return;
       }
       var s = Math.floor(ms / 1000), d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60);
@@ -504,7 +538,11 @@
     controller = buildMotion(media);
   }
 
+  var fitTimer;
+  addEventListener('resize', function () { clearTimeout(fitTimer); fitTimer = setTimeout(fitNames, 150); });
+
   preload(function () {
+    fitNames();
     root.classList.add('is-ready');
     if (controller) controller.start();
     media.velvet.setActive(true);
