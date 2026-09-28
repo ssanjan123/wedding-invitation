@@ -265,7 +265,7 @@
         ctx.translate(p.x + Math.sin(p.ph) * p.amp, p.y);
         ctx.rotate(p.rot);
         ctx.scale(Math.cos(p.flip), 1);
-        ctx.globalAlpha = 0.92;
+        ctx.globalAlpha = 0.82;
         ctx.drawImage(p.img, -w / 2, -h / 2, w, h);
         ctx.restore();
       }

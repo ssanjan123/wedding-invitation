@@ -547,13 +547,15 @@ html:not(.motion) .scene--venue { min-height: 100svh; }
 .crest--blessing { width: min(230px, 58vw); container-type: inline-size; }
 .crest--blessing .monogram { --mono-size: 10.5cqw; --mono-y: 3%; }
 
+/* later blocks are positioned so they paint above the calligraphy's medallion halo */
+.blessing__content > * { position: relative; }
 .calligraphy { position: relative; margin-top: 10px; padding: 18px 0 6px; isolation: isolate; }
 .calligraphy__halo {
   --halo: min(540px, 112vw);
   position: absolute; left: 50%; top: 50%; z-index: -1;
   width: var(--halo); max-width: none; height: auto; aspect-ratio: 760 / 753;
   margin: calc(var(--halo) * -0.4955) 0 0 calc(var(--halo) / -2);
-  opacity: .11;
+  opacity: .11; pointer-events: none;
 }
 .calligraphy__text {
   font-family: "Aref Ruqaa", var(--serif); font-weight: 700;
