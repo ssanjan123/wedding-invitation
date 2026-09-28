@@ -122,6 +122,54 @@
     });
   }
 
+  /* Initials sit in round medallions whose size and centre differ per emblem, and the script's
+     swashes (the A especially) make the letters' box lopsided. Measure the actual ink, then size
+     and shift it so it sits centred with a clear margin inside the medallion. */
+  var MEDALLIONS = {                      // centre and inner width as fractions of the emblem image
+    crest: { cx: 0.5, cy: 0.517, w: 0.231, ar: 632 / 900, fill: 0.72 },
+    'crest-small': { cx: 0.498, cy: 0.503, w: 0.412, ar: 698 / 520 },
+    seal: { cx: 0.499, cy: 0.467, w: 0.466, ar: 596 / 560 }
+  };
+  var inkCtx;
+  function inkOf(ini, px, family) {
+    inkCtx = inkCtx || document.createElement('canvas').getContext('2d');
+    var parts = [[ini[0], 1, 0], ['&', 0.62, 0.04], [ini[1], 1, 0]];   // mirrors "W<small>&</small>A"
+    var x = 0, L = 1e9, R = -1e9, T = 1e9, B = -1e9, asc = 0, desc = 0;
+    parts.forEach(function (part) {
+      var size = px * part[1];
+      inkCtx.font = size + 'px ' + family;
+      var m = inkCtx.measureText(part[0]);
+      x += part[2] * size;
+      L = Math.min(L, x - m.actualBoundingBoxLeft);
+      R = Math.max(R, x + m.actualBoundingBoxRight);
+      T = Math.min(T, -m.actualBoundingBoxAscent);
+      B = Math.max(B, m.actualBoundingBoxDescent);
+      if (part[1] === 1) { asc = m.fontBoundingBoxAscent || px * 0.8; desc = m.fontBoundingBoxDescent || px * 0.2; }
+      x += m.width + part[2] * size;
+    });
+    return { L: L, R: R, T: T, B: B, adv: x, asc: asc, desc: desc };
+  }
+  function fitMonograms() {
+    var ini = C.couple.initials || [C.couple.first[0], C.couple.second[0]];
+    $$('[data-initials]').forEach(function (el) {
+      var host = el.closest('.seal__half, .crest');
+      if (!host) return;
+      var kind = host.classList.contains('seal__half') ? 'seal'
+        : /crest-small/.test(host.querySelector('img').getAttribute('src')) ? 'crest-small' : 'crest';
+      var med = MEDALLIONS[kind], W = host.offsetWidth, H = W * med.ar, D = med.w * W;
+      if (!W) return;
+      var REF = 100, ink = inkOf(ini, REF, getComputedStyle(el).fontFamily);
+      var fill = med.fill || 0.62;                                                  // share of the medallion the ink may cover
+      var k = Math.min(fill * D / (ink.R - ink.L), fill * 0.8 * D / (ink.B - ink.T));
+      var px = REF * k;
+      var baseline = (px - (ink.asc + ink.desc) * k) / 2 + ink.asc * k;          // line-height: 1
+      var dx = med.cx * W - W / 2 - ((ink.L + ink.R) / 2 * k - ink.adv * k / 2);
+      var dy = med.cy * H - H / 2 - (baseline + (ink.T + ink.B) / 2 * k - px / 2);
+      el.style.fontSize = px.toFixed(2) + 'px';
+      el.style.translate = dx.toFixed(2) + 'px ' + dy.toFixed(2) + 'px';
+    });
+  }
+
   function buildDigits() {
     var holder = $('.date__digits');
     holder.innerHTML = '';
@@ -539,10 +587,14 @@
   }
 
   var fitTimer;
-  addEventListener('resize', function () { clearTimeout(fitTimer); fitTimer = setTimeout(fitNames, 150); });
+  addEventListener('resize', function () {
+    clearTimeout(fitTimer);
+    fitTimer = setTimeout(function () { fitNames(); fitMonograms(); }, 150);
+  });
 
   preload(function () {
     fitNames();
+    fitMonograms();
     root.classList.add('is-ready');
     if (controller) controller.start();
     media.velvet.setActive(true);

@@ -83,9 +83,8 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   line-height: 1;
   white-space: nowrap;
   color: var(--maroon-800);
-  translate: 0 var(--mono-y, 0);
+  translate: 0 var(--mono-y, 0);           /* js/main.js fitMonograms() sets exact size and offset */
   font-size: var(--mono-size, 1em);
-  padding-top: .12em;
 }
 /* crest.webp has its medallion at 23% of its width; crest-small.webp at 41% */
 .crest--invite, .crest--card { container-type: inline-size; }
@@ -305,8 +304,7 @@ html:not(.motion) .skip { display: none; }
 .seal__half--l { clip-path: polygon(0 0, 53% 0, 47% 38%, 54% 62%, 49% 100%, 0 100%); }
 .seal__half--r { clip-path: polygon(53% 0, 100% 0, 100% 100%, 49% 100%, 54% 62%, 47% 38%); }
 .seal__initials {
-  font-family: var(--script); font-size: 6.2cqw; line-height: 1;
-  padding-top: .1em;
+  font-family: var(--script); font-size: 4.4cqw; line-height: 1;
   filter: drop-shadow(0 1px 0 rgba(0, 0, 0, .55));
 }
 
