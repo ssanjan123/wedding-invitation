@@ -16,6 +16,8 @@
   --gold-600: #A07A2C;
   --gold-500: #C9A24B;
   --gold-300: #F1D98A;
+  --emerald-950: #04160F;
+  --emerald-900: #082A1F;
   --emerald-800: #0F4D3A;
   --ivory: #F3E7CF;
   --ink: #4A0B14;
@@ -99,7 +101,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .js .preloader {
   position: fixed; inset: 0; z-index: 100;
   display: grid; place-items: center;
-  background: radial-gradient(ellipse at 50% 45%, var(--maroon-800), var(--maroon-950) 72%);
+  background: radial-gradient(ellipse at 50% 45%, var(--emerald-800), var(--emerald-950) 72%);
   transition: opacity 1s ease, visibility 0s linear 1s;
 }
 .preloader > * { grid-area: 1 / 1; }
@@ -195,12 +197,12 @@ html:not(.motion) .skip { display: none; }
 /* ==========================================================================
    Page 1: the envelope
    ========================================================================== */
-.scene--envelope { display: grid; place-items: center; background: var(--maroon-900) url("../assets/img/damask.webp") center / 512px; }
+.scene--envelope { display: grid; place-items: center; background: var(--emerald-900); }
 .velvet__shade {
   position: absolute; inset: 0;
   background:
-    radial-gradient(ellipse 70% 60% at 50% 50%, transparent 40%, rgba(20, 3, 6, .55) 100%),
-    linear-gradient(to bottom, rgba(20, 3, 6, .25), transparent 25%, transparent 75%, rgba(20, 3, 6, .45));
+    radial-gradient(ellipse 70% 60% at 50% 50%, transparent 40%, rgba(2, 12, 9, .55) 100%),
+    linear-gradient(to bottom, rgba(2, 12, 9, .25), transparent 25%, transparent 75%, rgba(2, 12, 9, .45));
 }
 
 .env-float { position: relative; width: var(--env-w); height: var(--env-h); z-index: 2; }
@@ -249,14 +251,14 @@ html:not(.motion) .skip { display: none; }
 .env-pocket {
   position: absolute; inset: 0; z-index: 3;
   clip-path: polygon(0 0, 50% 55%, 100% 0, 100% 100%, 0 100%);
-  background: var(--maroon-700) url("../assets/img/env-paper.webp") center / cover;
+  background: var(--ivory) url("../assets/img/card-paper.webp") center / cover;
 }
 .env-pocket__shade { position: absolute; inset: 0; }
 .env-pocket__shade--l { clip-path: polygon(0 0, 50% 55%, 0 100%); background: linear-gradient(90deg, rgba(255, 230, 200, .07), transparent 60%); }
 .env-pocket__shade--r { clip-path: polygon(100% 0, 50% 55%, 100% 100%); background: linear-gradient(270deg, rgba(0, 0, 0, .12), transparent 60%); }
 .env-pocket__shade--b { clip-path: polygon(0 100%, 50% 55%, 100% 100%); background: linear-gradient(to top, rgba(0, 0, 0, .2), rgba(0, 0, 0, .04)); }
 .env-seams { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.env-seams * { fill: none; stroke: var(--gold-500); vector-effect: non-scaling-stroke; }
+.env-seams * { fill: none; stroke: var(--gold-600); vector-effect: non-scaling-stroke; }
 .env-seams polyline { stroke-width: 1.4; opacity: .95; }
 .env-seams line { stroke-width: .8; opacity: .45; }
 .env-seams rect { stroke-width: .8; opacity: .55; }
@@ -265,13 +267,14 @@ html:not(.motion) .skip { display: none; }
   position: absolute; left: 0; right: 0; bottom: 9%;
   text-align: center; font-family: var(--script); font-size: 6.4cqw; line-height: 1.2;
   padding: 0 12%;
-  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, .45));
+  background-image: var(--foil-deep);
+  filter: drop-shadow(0 1px 0 rgba(255, 248, 230, .8));
 }
 
 .env-flap-shadow {
   position: absolute; left: 0; right: 0; top: 0; height: 62%; z-index: 4;
   clip-path: polygon(0 0, 100% 0, 50% 100%);
-  background: rgba(0, 0, 0, .35); filter: blur(6px); translate: 0 5px;
+  background: rgba(60, 40, 10, .22); filter: blur(6px); translate: 0 5px;
 }
 .env-flap {
   position: absolute; left: 0; right: 0; top: 0; height: 58%; z-index: 5;
@@ -283,10 +286,10 @@ html:not(.motion) .skip { display: none; }
   -webkit-backface-visibility: hidden; backface-visibility: hidden;
 }
 .env-flap__out {
-  background: linear-gradient(to bottom, rgba(255, 225, 200, .08), rgba(0, 0, 0, .12)), var(--maroon-700) url("../assets/img/env-paper.webp") center top / 100% auto;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, .12), rgba(110, 78, 18, .14)), var(--ivory) url("../assets/img/card-paper.webp") center top / 100% auto;
 }
 .env-flap__out svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-.env-flap__out polyline { fill: none; stroke: var(--gold-500); stroke-width: 1.4; vector-effect: non-scaling-stroke; }
+.env-flap__out polyline { fill: none; stroke: var(--gold-600); stroke-width: 1.4; vector-effect: non-scaling-stroke; }
 .env-flap__in {
   transform: rotateY(180deg);
   background: linear-gradient(to top, rgba(0, 0, 0, .35), transparent 60%), url("../assets/img/liner.webp") center / 60% auto, var(--emerald-800);

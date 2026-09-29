@@ -380,7 +380,7 @@
   /* ------------------------------------------------------------ preloader */
   function preload(done) {
     var loader = $('.preloader');
-    var urls = ['assets/img/seal.webp', 'assets/img/env-paper.webp', 'assets/img/liner.webp', 'assets/img/card-paper.webp',
+    var urls = ['assets/img/seal.webp', 'assets/img/liner.webp', 'assets/img/card-paper.webp',
       'assets/img/crest.webp', 'assets/img/arch.webp', portrait.matches ? 'assets/img/velvet-port.jpg' : 'assets/img/velvet-land.jpg'];
     var total = urls.length + 1, n = 0, finished = false;
     function finish() {
