@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A single-page, scroll-animated wedding invitation (Wahid & Anushka, 27 December 2026, BAF Shaheen Hall, Dhaka). It is a plain static site: no package.json, no build step, no bundler, no tests, no linter. GSAP, ScrollTrigger and Lenis are vendored as minified files in `vendor/`. The JS is ES5-style (`var`, IIFEs, globals), loaded by `<script>` tags in this order: vendor, `js/config.js`, `js/media.js`, `js/main.js`. Keep that style. Don't add modules or tooling.
+A single-page, scroll-animated wedding invitation (Wahid & Anushka, 27 December 2026, BAF Shaheen Hall, Dhaka). It is a plain static site: no package.json, no build step, no bundler, no tests, no linter. GSAP, ScrollTrigger and Lenis are vendored as minified files in `vendor/`. The JS is ES5-style (`var`, IIFEs, globals), loaded by `<script>` tags in this order: vendor, `js/config.js`, `js/media.js`, `js/sound.js`, `js/main.js`. Keep that style. Don't add modules or tooling.
 
 A second, separate invitation for the Gaye Holud lives in `holud/` (see "Holud page" below).
 
@@ -16,7 +16,7 @@ A second, separate invitation for the Gaye Holud lives in `holud/` (see "Holud p
 URL parameters for checking a specific moment:
 - `?t=<units>`: jump to a point on the scroll timeline (0 to 13.6, see below), e.g. `?t=6.9` for the date.
 - `?p=<0..1>`: jump to a fraction of the whole page.
-- `?debug`: turns off the preloader delay, makes scrub instant (`scrub: true`), loads the venue film right away and exposes `window.__seek(t)` / `window.__seekPage(p)`. `?t` and `?p` turn on debug too. On the holud page it also skips the sound choice and exposes `window.__sound` (call `__sound.enable()`, then `__sound.debug()` to see what loaded and which cues fired).
+- `?debug`: turns off the preloader delay, makes scrub instant (`scrub: true`), loads the venue film right away and exposes `window.__seek(t)` / `window.__seekPage(p)`. `?t` and `?p` turn on debug too. It also skips the sound choice and exposes `window.__sound` (call `__sound.enable()`, then `__sound.debug()` to see what loaded and which cues fired).
 - `?to=Sarah%20%26%20Tom`: guest name on the envelope ("For Sarah & Tom").
 
 ## Architecture
@@ -32,7 +32,8 @@ There is one master timeline measured in abstract **units**: `TOTAL = 13.6` unit
 - `onUpdate` plays the velvet loop while `t < 3.4`, starts fetching the venue film at `t > 0.4` and dims the gold dust between 3.3 and 8.3.
 - The Skip button scrolls to the `invite` label.
 - The venue card fades at 13.0 because the blessing page's `-30vh` overlap starts to cover the film there.
-When you move a beat, check these and the `?t=` values you test with. The Arabic calligraphy and its halo on page 4 have their own separate ScrollTriggers.
+- The `SOUND` manifest just above `buildMotion` places the music and courtyard levels and the cues (seal 0.33, flap 0.62, card 1.45, swell 2.6, names 4.1, date 6.3, doorway 8.35) at unit positions.
+When you move a beat, check these, its sounds and the `?t=` values you test with. The Arabic calligraphy and its halo on page 4 have their own separate ScrollTriggers.
 
 ### Content binding
 `js/config.js` (`window.INVITE`) is the single source of guest-facing text. `index.html` holds the same text as fallback for no-JS. `fillContent()` overwrites it through data attributes:
@@ -62,10 +63,10 @@ A joint Gaye Holud invitation (Thursday 24 December 2026, 7 to 11 pm, BGB Banque
 - **Centring:** elements that GSAP transforms (card, knot, alpona corners, curtain strands) are centred with negative margins, not the CSS `translate` property. GSAP folds `translate` into its own transform and reads it as 0 px on an image that hasn't loaded yet. The dabs use `xPercent`/`yPercent`.
 - **Measured artwork:** `MEDALLIONS.alpona` is the alpona's empty centre, and `.disc` is the rice-white disc that `.crest--disc` draws over it so small tokens get larger initials. The palm's empty circle sits at (37.5%, 55.96%) of the image and is 44.2% of its width across; `.palm-box` and `.date` in `holud/css/style.css` depend on that. Re-measure if you replace `alpona.webp` or `mehedi-palm.png`.
 - The curtain is built in JS (`buildCurtain`, seeded so it is the same every visit): 11, 16 or 22 strands by screen width. On phones the parted strands tuck almost off-screen so the venue text stays clear.
-- **Sound** (`js/sound.js`, written to be shared; so far only the holud page uses it). When loading finishes, the preloader asks **Open with sound / Open quietly** (`InviteSound.gate`); browsers only allow sound after a tap, and nothing audio-related is fetched for guests who open quietly. The round `.music` button then toggles sound (`InviteSound.toggle`), and `sound: false` in `holud/js/config.js` removes the question and all audio.
+- **Sound** (`js/sound.js`, shared with the wedding page, which works the same way with its own `SOUND` manifest and files in `assets/audio/`). When loading finishes, the preloader asks **Open with sound / Open quietly** (`InviteSound.gate`); browsers only allow sound after a tap, and nothing audio-related is fetched for guests who open quietly. The round `.music` button then toggles sound (`InviteSound.toggle`), and `sound: false` in `holud/js/config.js` removes the question and all audio.
   - The `SOUND` manifest just above `buildMotion` has **beds** (loops whose level follows the timeline through a `curve` of `[t, gain]` points; `still` is the level in still mode), **cues** (one-shots fired when `t` passes `at` going forward, at most one per 250 ms, never going backward) and **taps** (`sound.play('dab')`). `onUpdate` calls `sound.setTime(t)`, so when a beat moves, move its sounds.
   - Loops play as overlapping buffer sources with a 1.5 s equal-power cross-fade, which hides mp3 padding; don't switch to `loop = true`, which clicks at the seam. On iOS, `enable()` sets `navigator.audioSession.type = 'playback'` (or plays a silent looping `<audio>` on older iOS) so the silent switch doesn't mute the page. Hiding the tab suspends the audio.
   - The files are in `holud/assets/audio/`. Higgsfield has no music or sound-effect model for general use, so they were made with video models that generate sound (`wan3_0` for the music, `seedance_2_0_mini` for ambience and cues), keeping only the soundtrack. Music is mastered to about −16 LUFS and ambience to about −20 LUFS; cues are peak-normalised mono 96 kbps.
 
 ## Assets
-All artwork and films were generated in Higgsfield. The originals live in `assets/raw/` (the holud set in `assets/raw/holud/`), which is gitignored and not deployed (the generated audio clips are in `assets/raw/audio/`). Portrait (`-port`) and landscape (`-land`) versions exist for the films and their posters. Music is optional: an mp3 at `assets/audio/music.mp3` (`musicUrl`) makes the music button appear.
+All artwork and films were generated in Higgsfield. The originals live in `assets/raw/` (the holud set in `assets/raw/holud/`), which is gitignored and not deployed (the generated audio clips are in `assets/raw/audio/`). Portrait (`-port`) and landscape (`-land`) versions exist for the films and their posters. The wedding's sound is in `assets/audio/` (`sound: true` in `js/config.js`).

@@ -250,27 +250,6 @@
     setInterval(tick, 1000);
   }
 
-  /* ---------------------------------------------------------------- music */
-  function music() {
-    var btn = $('.music');
-    if (!C.musicUrl || !btn) return;
-    var audio = new Audio();
-    audio.loop = true;
-    audio.preload = 'metadata';
-    audio.volume = 0.7;
-    audio.addEventListener('loadedmetadata', function () { btn.hidden = false; }, { once: true });
-    audio.src = C.musicUrl;
-    btn.addEventListener('click', function () {
-      if (audio.paused) {
-        audio.play().then(function () { btn.setAttribute('aria-pressed', 'true'); }).catch(function () {});
-      } else {
-        audio.pause();
-        btn.setAttribute('aria-pressed', 'false');
-      }
-    });
-    $('.sr-only', btn).textContent = 'Music';
-  }
-
   /* ----------------------------------------------------------- gold dust */
   function Dust(canvas) {
     var ctx = canvas.getContext('2d'), dpr = Math.min(2, window.devicePixelRatio || 1);
@@ -403,6 +382,27 @@
     setTimeout(finish, 7000);
   }
 
+  /* ---------------------------------------------------------------- sound */
+  // Bed levels and cue times are timeline units (see buildMotion): when a beat moves, move its sound.
+  // `still` is the level used without the scroll timeline (reduced motion).
+  var SOUND = {
+    beds: [
+      { url: 'assets/audio/music.mp3', still: 1,
+        curve: [[0, 0.55], [2.6, 0.55], [3.3, 0.9], [8.1, 0.9], [9.0, 0.45], [12.8, 0.45], [13.6, 0.9]] },
+      { url: 'assets/audio/courtyard.mp3', still: 0,
+        curve: [[8.3, 0], [9.3, 0.85], [12.6, 0.85], [13.6, 0]] }
+    ],
+    cues: [
+      { at: 0.33, url: 'assets/audio/seal.mp3' },
+      { at: 0.62, url: 'assets/audio/flap.mp3' },
+      { at: 1.45, url: 'assets/audio/card.mp3', gain: 0.8 },
+      { at: 2.6, url: 'assets/audio/swell.mp3', gain: 0.7 },
+      { at: 4.1, url: 'assets/audio/shimmer.mp3', gain: 0.55 },
+      { at: 6.3, url: 'assets/audio/tick.mp3', gain: 0.9 },
+      { at: 8.35, url: 'assets/audio/whoosh.mp3', gain: 0.8 }
+    ]
+  };
+
   /* --------------------------------------------------------------- motion */
   function buildMotion(media) {
     gsap.registerPlugin(ScrollTrigger);
@@ -451,6 +451,7 @@
           media.velvet.setActive(t < 3.4);
           if (t > 0.4) media.venue.load();   // guest has started opening: fetch the venue film now
           media.dust.setLevel(t > 3.3 && t < 8.3 ? 0.2 : 1);
+          if (media.sound) media.sound.setTime(t);
         }
       }
     });
@@ -587,13 +588,15 @@
   /* ----------------------------------------------------------------- boot */
   fillContent();
   countdown();
-  music();
 
-  var M = window.InviteMedia;
+  var M = window.InviteMedia, S = window.InviteSound;
+  var sound = C.sound && S && S.supported ? S.create(SOUND) : null;
+  if (debug) window.__sound = sound;   // test hook: __sound.enable(), __sound.debug()
   var media = {
     velvet: M.Loop($('.velvet__video')),
     venue: M.Scrub($('.film__video')),
-    dust: { setLevel: function () {} }
+    dust: { setLevel: function () {} },
+    sound: sound
   };
 
   var controller = null;
@@ -609,12 +612,18 @@
     fitTimer = setTimeout(function () { fitNames(); fitMonograms(); }, 150);
   });
 
-  preload(function () {
+  function open() {
     fitNames();
     fitMonograms();
     root.classList.add('is-ready');
     if (controller) controller.start();
     media.velvet.setActive(true);
     if (debug && motion) media.venue.load();
+    if (S) S.toggle($('.music'), sound);
+  }
+  // once loaded, guests choose "Open with sound" or "Open quietly" (test links skip the question)
+  preload(function () {
+    if (S) S.gate($('.preloader'), debug ? null : sound, open);
+    else open();
   });
 })();

@@ -113,6 +113,15 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   transition: stroke-dashoffset .5s ease;
 }
 .is-ready .preloader { opacity: 0; visibility: hidden; }
+/* once loaded: "Open with sound" / "Open quietly" below the ring */
+.preloader__choice {
+  position: absolute; left: 0; right: 0; top: calc(50% + 124px);
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 12px 14px;
+  padding: 0 var(--gutter);
+  animation: choice .7s ease both;
+}
+.preloader__choice[hidden] { display: none; }
+@keyframes choice { from { opacity: 0; translate: 0 10px; } }
 
 .progress { position: fixed; inset: 0 0 auto; height: 2px; z-index: 30; pointer-events: none; }
 .progress span {
@@ -641,6 +650,11 @@ html:not(.motion) .scene--venue { min-height: 100svh; }
   .venue-card .btn { justify-self: start; margin-top: 10px; min-height: 42px; padding: 8px 22px; }
   .evening { grid-column: 2; grid-row: 1 / span 4; margin: 0; }
   .venue-card__address, .venue-card__when, .evening__list li { font-size: 16px; }
+}
+
+/* The round sound button sits in the bottom-right corner: on phones, keep the venue card clear of it */
+@media (max-width: 480px) {
+  .sound-toggle .venue-card { margin-bottom: calc(max(20px, env(safe-area-inset-bottom)) + 58px); }
 }
 
 /* Small screens -------------------------------------------------------------- */

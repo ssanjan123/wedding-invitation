@@ -32,9 +32,12 @@ so share the holud link only with holud guests.
 Add `?to=` to the address to write a guest's name on the envelope:
 `https://your-site/index.html?to=Sarah%20%26%20Tom` shows "For Sarah & Tom".
 
-## Music (optional)
-Put an audio file at `assets/audio/music.mp3`. A music button appears in the corner; guests tap it to play.
-Without the file the button stays hidden.
+## Sound
+When the invitation has loaded, guests choose **Open with sound** or **Open quietly**. With sound on, music
+plays and rises and dips with the story, the venue film gets a fountain in the background, and small sounds
+mark the moments (the wax seal cracking, the flap, the card, the names, the date, the doorway). A round button
+in the corner turns sound on and off. To switch it off entirely, set `sound: false` in `js/config.js`.
+The sound files are in `assets/audio`.
 
 ## Put it online
 Upload the whole folder to any static host, for example Netlify Drop (drag the folder onto
@@ -49,4 +52,5 @@ In this folder run `python -m http.server 8080`, then open http://localhost:8080
 - `css/style.css`: all styling
 - `js/main.js`: the scroll story, countdown, calendar file, petals and gold dust
 - `js/media.js`: the films (portrait versions for phones, skipped for reduced motion or data saver)
+- `js/sound.js`: the sound (music, background sound and moment sounds, shared with the holud page)
 - `assets/img`, `assets/film`: artwork and films generated in Higgsfield (`assets/raw` keeps the originals and can be left out when uploading)

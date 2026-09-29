@@ -54,6 +54,7 @@ window.INVITE = {
   signoff: "With love,",
   families: "and their families",
 
-  // Optional. Put an .mp3 at this path and a music button appears; otherwise it stays hidden.
-  musicUrl: "assets/audio/music.mp3"
+  // Music, ambience and sound effects (the files are in assets/audio, the timings in js/main.js).
+  // Guests choose "Open with sound" or "Open quietly" when the page has loaded. false turns all sound off.
+  sound: true
 };
