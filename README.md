@@ -18,9 +18,11 @@ Live site: https://ssanjan123.github.io/wedding-invitation/ (GitHub Pages). Any 
 ## The holud invitation
 A separate invitation for the Gaye Holud is in the `holud/` folder and lives at
 https://ssanjan123.github.io/wedding-invitation/holud/. A painted kula holds a card tied with red-and-yellow
-thread; a swipe of turmeric paste writes the names; mehedi is drawn up a palm that holds the date; a curtain of
+thread; a swipe of turmeric paste writes the names; a palm drawn in henna lines holds the date; a curtain of
 marigold strings parts onto the holud stage; the last page asks guests to come dressed in holud and links to the
-wedding invitation. Guests can tap the swipe page to leave a dab of holud.
+wedding invitation. Guests can tap the swipe page to leave a dab of holud. When it loads, guests choose
+"Open with sound" or "Open quietly": with sound, a dhol-and-flute tune, the room, the thread, the turmeric swipe,
+the marigold curtain and a cheer from the hall follow the story (`sound: false` in `holud/js/config.js` turns it off).
 
 Edit its wording in `holud/js/config.js`, and its link-preview tags at the top of `holud/index.html`.
 `?to=` works the same way there (the name goes on the tray's tag). The wedding page does not link to it,

@@ -26,7 +26,7 @@ window.INVITE = {
   },
   hosts: "Our two families invite you to the",
   of: "of",
-  request: "an evening of holud, mehedi, music and a great deal of dancing",
+  request: "an evening of holud, music and a great deal of dancing",
   tapHint: "Tap anywhere to add a little holud",
 
   // Local time at the venue, 24-hour clock
@@ -34,13 +34,6 @@ window.INVITE = {
   end: "2026-12-24T23:00",
   // Bangladesh time, so the countdown and calendar are right for guests anywhere
   utcOffset: "+06:00",
-
-  // Page 3: the date is written in the mehedi. Leave `hidden` empty to drop the little game.
-  mehedi: {
-    hidden: "Wahid",
-    hint: "Brides hide the groom’s name in their mehedi. Can you find it?",
-    found: "Found him!"
-  },
 
   venue: {
     lead: "The holud will be held at",
@@ -75,6 +68,7 @@ window.INVITE = {
     url: "../"
   },
 
-  // Optional. Put an .mp3 at this path and a music button appears; otherwise it stays hidden.
-  musicUrl: "assets/audio/music.mp3"
+  // Music, ambience and sound effects (the files are in holud/assets/audio, the timings in holud/js/main.js).
+  // Guests choose "Open with sound" or "Open quietly" when the page has loaded. false turns all sound off.
+  sound: true
 };

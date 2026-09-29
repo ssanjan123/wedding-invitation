@@ -35,6 +35,10 @@
       <span class="monogram" data-initials>W&amp;A</span>
     </div>
     <svg class="preloader__ring" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" pathLength="1"/></svg>
+    <div class="preloader__choice" hidden>
+      <button class="btn btn--leaf" type="button" data-sound-on>Open with sound</button>
+      <button class="btn btn--quiet" type="button">Open quietly</button>
+    </div>
   </div>
 
   <div class="progress" aria-hidden="true"><span></span></div>
@@ -43,7 +47,7 @@
   <div class="controls">
     <button class="skip" type="button">Skip to the invitation</button>
     <button class="music" type="button" aria-pressed="false" hidden>
-      <span class="sr-only">Play music</span>
+      <span class="sr-only">Sound</span>
       <svg viewBox="0 0 24 24" aria-hidden="true"><path class="music__on" d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/><path class="music__off" d="M4 4l16 16"/></svg>
     </button>
   </div>
@@ -87,7 +91,7 @@
       <!-- Strands of marigold that fall over page 3 and part onto the stage (motion only; js/main.js fills it) -->
       <div class="curtain" aria-hidden="true"></div>
 
-      <!-- Pages 2 and 3: the holud swipe, then the mehedi palm -->
+      <!-- Pages 2 and 3: the holud swipe, then the date on a palm -->
       <section class="scene scene--holud" id="invitation" aria-label="Invitation">
         <div class="holud-bg"></div>
         <img class="corner corner--tl" src="assets/img/alpona.webp" alt="" loading="lazy">
@@ -115,7 +119,7 @@
             <span class="names__amp">&amp;</span>
             <span class="names__two" data-bind="secondFull">Anushka Shahreen</span>
           </p>
-          <p class="request" data-bind="request">an evening of holud, mehedi, music and a great deal of dancing</p>
+          <p class="request" data-bind="request">an evening of holud, music and a great deal of dancing</p>
           <p class="tap-hint" aria-hidden="true" data-bind="tapHint">Tap anywhere to add a little holud</p>
         </div>
 
@@ -126,12 +130,10 @@
             <p class="date__day"><span class="sr-only" data-day>24</span><span class="date__digits" aria-hidden="true"></span></p>
             <p class="date__month" data-bind="monthYear">December 2026</p>
           </div>
-          <button class="hidden-name" type="button" aria-label="The groom’s name, hidden in the mehedi" data-hidden-name>Wahid</button>
         </div>
         <div class="date-foot holud-b">
           <p class="date__time" data-bind="timeWords">at seven o’clock in the evening</p>
           <p class="countdown"></p>
-          <p class="mehedi-hint" data-bind="mehedi.hint">Brides hide the groom’s name in their mehedi. Can you find it?</p>
         </div>
       </section>
 
@@ -239,6 +241,7 @@
   <script src="../vendor/lenis.min.js"></script>
   <script src="js/config.js"></script>
   <script src="../js/media.js"></script>
+  <script src="../js/sound.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

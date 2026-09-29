@@ -242,40 +242,6 @@
     setInterval(tick, 1000);
   }
 
-  /* ------------------------------------------------ the name in the mehedi */
-  function mehediGame() {
-    var btn = $('[data-hidden-name]'), hint = $('.mehedi-hint');
-    if (!C.mehedi || !C.mehedi.hidden) { btn.hidden = true; hint.hidden = true; return; }
-    btn.textContent = C.mehedi.hidden;
-    btn.addEventListener('click', function () {
-      if (btn.classList.contains('is-found')) return;
-      btn.classList.add('is-found');
-      hint.textContent = C.mehedi.found;
-      hint.classList.add('is-found');
-    });
-  }
-
-  /* ---------------------------------------------------------------- music */
-  function music() {
-    var btn = $('.music');
-    if (!C.musicUrl || !btn) return;
-    var audio = new Audio();
-    audio.loop = true;
-    audio.preload = 'metadata';
-    audio.volume = 0.7;
-    audio.addEventListener('loadedmetadata', function () { btn.hidden = false; }, { once: true });
-    audio.src = C.musicUrl;
-    btn.addEventListener('click', function () {
-      if (audio.paused) {
-        audio.play().then(function () { btn.setAttribute('aria-pressed', 'true'); }).catch(function () {});
-      } else {
-        audio.pause();
-        btn.setAttribute('aria-pressed', 'false');
-      }
-    });
-    $('.sr-only', btn).textContent = 'Music';
-  }
-
   /* ---------------------------------------------------- holud powder dust */
   function Dust(canvas) {
     var ctx = canvas.getContext('2d'), dpr = Math.min(2, window.devicePixelRatio || 1);
@@ -406,6 +372,7 @@
       box.appendChild(dab);
       gsap.fromTo(dab, { xPercent: -50, yPercent: -50, scale: 0.35, rotation: Math.random() * 360, autoAlpha: 0 }, { scale: 1, autoAlpha: 0.95, duration: 0.35, ease: 'back.out(2.2)' });
       marks.push(dab);
+      if (sound) sound.play('dab');
       if (marks.length > 30) marks.shift().remove();
       for (var i = 0; i < 5; i++) {
         var p = document.createElement('img');
@@ -474,6 +441,28 @@
     setTimeout(finish, 7000);
   }
 
+  /* ---------------------------------------------------------------- sound */
+  // Bed levels and cue times are timeline units (see buildMotion): when a beat moves, move its sound.
+  // `still` is the level used without the scroll timeline (reduced motion).
+  var SOUND = {
+    beds: [
+      { url: 'assets/audio/music.mp3', still: 1,
+        curve: [[0, 0.5], [3.2, 0.5], [3.7, 0.85], [5.9, 0.85], [6.3, 0.6], [8.2, 0.6], [9.2, 1]] },
+      { url: 'assets/audio/room.mp3', still: 0, curve: [[0, 0.6], [2.4, 0.6], [3.2, 0]] },
+      { url: 'assets/audio/hall.mp3', still: 0, curve: [[8.9, 0], [9.6, 0.85], [13.4, 0.7], [14.4, 0]] }
+    ],
+    cues: [
+      { at: 0.36, url: 'assets/audio/thread.mp3', gain: 0.8 },
+      { at: 0.8, url: 'assets/audio/doors.mp3' },
+      { at: 3.65, url: 'assets/audio/smear.mp3' },
+      { at: 8.2, url: 'assets/audio/rustle.mp3', gain: 0.8 },
+      { at: 9.2, url: 'assets/audio/cheer.mp3' }
+    ],
+    taps: {
+      dab: ['assets/audio/dab-1.mp3', 'assets/audio/dab-2.mp3', 'assets/audio/dab-3.mp3']
+    }
+  };
+
   /* --------------------------------------------------------------- motion */
   function buildMotion(media) {
     gsap.registerPlugin(ScrollTrigger);
@@ -497,7 +486,7 @@
     var hosts = $('.hosts'), paste = $('.swipe__paste'), bangla = $('.swipe__bangla'), eventName = $('.swipe__name');
     var of = $('.of'), nOne = $('.names__one'), nTwo = $('.names__two'), amp = $('.names__amp');
     var request = $('.request'), tapHint = $('.tap-hint');
-    var palmBox = $('.palm-box'), palm = $('.palm'), dateFoot = $('.date-foot'), hidden = $('.hidden-name');
+    var palmBox = $('.palm-box'), palm = $('.palm'), dateFoot = $('.date-foot');
     var strands = buildCurtain();
     var film = $('.film'), vTitle = $('.venue-title'), vCard = $('.venue-card');
     var line = $('.evening__line line'), items = $$('.evening__list li');
@@ -519,6 +508,7 @@
           media.cloth.setActive(t < 3.3);
           if (t > 0.4) media.stage.load();   // guest has started untying: fetch the stage film now
           media.dust.setLevel(t < 3.2 ? 0.6 : t < 8.9 ? 0 : 1);
+          if (media.sound) media.sound.setTime(t);
         }
       }
     });
@@ -567,7 +557,7 @@
       .from(tapHint, { autoAlpha: 0, y: 8, ease: 'power2.out', duration: 0.3 }, 5.55)
       .addLabel('invite', 5.8);
 
-    /* Beat B: mehedi is drawn up the palm and the date sits in its centre */
+    /* Beat B: mehndi lines are drawn up a palm and the date sits in its centre */
     tl.to([hosts, $('.swipe'), of, $('.names'), request, tapHint, dabs], { autoAlpha: 0, y: -18, ease: 'power2.in', duration: 0.4, stagger: 0.03 }, 6.0)
       .to(garlands, { yPercent: -105, ease: 'power2.in', duration: 0.5, stagger: 0.04 }, 6.0)
       .from(palmBox, { autoAlpha: 0, y: function () { return innerHeight * 0.1; }, ease: 'power2.out', duration: 0.6 }, 6.2)
@@ -579,7 +569,6 @@
     });
     tl.from('.date__month', { autoAlpha: 0, y: 10, ease: 'power2.out', duration: 0.35 }, 7.15)
       .from(dateFoot, { autoAlpha: 0, y: 10, ease: 'power2.out', duration: 0.4 }, 7.3)
-      .from(hidden, { autoAlpha: 0, duration: 0.4 }, 7.4)
       .addLabel('date', 7.9);
 
     /* Beat C: a curtain of marigold strings falls, then parts onto the holud stage */
@@ -666,16 +655,18 @@
   }
 
   /* ----------------------------------------------------------------- boot */
+  var M = window.InviteMedia, S = window.InviteSound;
+  var sound = C.sound && S && S.supported ? S.create(SOUND) : null;
+  if (debug) window.__sound = sound;   // test hook: __sound.enable(), __sound.debug()
+
   fillContent();
   countdown();
-  mehediGame();
-  music();
 
-  var M = window.InviteMedia;
   var media = {
     cloth: M.Loop($('.cloth__video')),
     stage: M.Scrub($('.film__video')),
-    dust: { setLevel: function () {} }
+    dust: { setLevel: function () {} },
+    sound: sound
   };
 
   var controller = null;
@@ -691,12 +682,18 @@
     fitTimer = setTimeout(function () { fitNames(); fitMonograms(); }, 150);
   });
 
-  preload(function () {
+  function open() {
     fitNames();
     fitMonograms();
     root.classList.add('is-ready');
     if (controller) controller.start();
     media.cloth.setActive(true);
     if (debug && motion) media.stage.load();
+    if (S) S.toggle($('.music'), sound);
+  }
+  // once loaded, guests choose "Open with sound" or "Open quietly" (test links skip the question)
+  preload(function () {
+    if (S) S.gate($('.preloader'), debug ? null : sound, open);
+    else open();
   });
 })();
