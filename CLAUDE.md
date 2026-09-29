@@ -6,9 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A single-page, scroll-animated wedding invitation (Wahid & Anushka, 27 December 2026, BAF Shaheen Hall, Dhaka). It is a plain static site: no package.json, no build step, no bundler, no tests, no linter. GSAP, ScrollTrigger and Lenis are vendored as minified files in `vendor/`. The JS is ES5-style (`var`, IIFEs, globals), loaded by `<script>` tags in this order: vendor, `js/config.js`, `js/media.js`, `js/main.js`. Keep that style. Don't add modules or tooling.
 
+A second, separate invitation for the Gaye Holud lives in `holud/` (see "Holud page" below).
+
 ## Commands
 
-- Preview: `python -m http.server 8080`, then open http://localhost:8080. Opening `index.html` from disk also works, but the venue film then streams instead of loading as a blob (see `media.js`), so scrubbing is worse.
+- Preview: `python -m http.server 8080`, then open http://localhost:8080 (the holud page is http://localhost:8080/holud/). Opening `index.html` from disk also works, but the venue film then streams instead of loading as a blob (see `media.js`), so scrubbing is worse.
 - Deploy: GitHub Pages serves `main` at https://ssanjan123.github.io/wedding-invitation/ (`.nojekyll` is present). **Every push to `main` goes live within a minute or two**, so a push is publishing to guests.
 
 URL parameters for checking a specific moment:
@@ -52,5 +54,14 @@ Both run after fonts load (in `preload`) and again on a debounced resize.
 - `Scrub` maps the venue film's `currentTime` to scroll progress. Over http(s) it fetches the whole clip as a blob so seeks are instant. On iOS it plays and pauses once on the first `touchstart` so that seeked frames get painted. Until the film is ready, the gate poster cross-fades to the courtyard end poster.
 Each `<video>` has `data-land` / `data-port`, and the clip is picked by orientation and reloaded when orientation changes. With reduced motion, data saver or a 2g/3g connection, no video is fetched and only the posters show. Scrub clips need frequent keyframes (short GOP H.264) or seeking stutters.
 
+## Holud page (`holud/`)
+A joint Gaye Holud invitation (Thursday 24 December 2026, 7 to 11 pm, BGB Banquet Hall, Shimanto Shambhar), live at https://ssanjan123.github.io/wedding-invitation/holud/. It links back to the wedding (`wedding.url: "../"`); the wedding page does not link to it, because not every wedding guest is a holud guest. Its story follows a holud evening: a painted kula with a thread-tied card, a swipe of turmeric paste that writes গায়ে হলুদ and the names, mehedi drawn up a palm holding the date, a marigold-string curtain that parts onto a scrubbed film of the stage, and a "come dressed in holud" closing page.
+- Same conventions as the wedding page: `holud/js/config.js` (`window.INVITE`) holds every guest-facing string, the same `data-*` bindings, both render modes and the same URL parameters. Its `<title>` and `og:` tags are hand-written too.
+- **Shared files:** it loads `../vendor/*.js` and `../js/media.js` directly, and its petals are `../assets/img/petal-*.webp` and `leaf-gold.webp`. A change to any of those affects both pages. `holud/js/main.js` is adapted from `js/main.js` (dates, content binding, monograms, calendar, countdown, dust, petals), so fix shared bugs in both.
+- **Timeline:** `TOTAL = 14.4`, `UNIT = 0.5`. Tray 0 to 3.2, holud swipe 3.2 to 5.8 (label `invite`), mehedi 5.8 to 7.9 (label `date`), curtain falls at 8.2 and parts 9.2 to 10.3, stage film scrubs 9.1 to 13.2, venue card fades at 13.8 before the closing page's `-30vh` overlap. `onUpdate`: cloth loop while `t < 3.3`, stage film fetch at `t > 0.4`, dust 0.6 on the tray, 0 on the paper pages (3.2 to 8.9) and 1 on the stage. Tap-to-dab works while `3.7 < t < 5.95` and on the closing page. Useful `?t=` stops: 0, 1.4, 3.0, 5.8, 7.9, 8.7, 9.8, 12.4.
+- **Centring:** elements that GSAP transforms (card, knot, alpona corners, curtain strands) are centred with negative margins, not the CSS `translate` property. GSAP folds `translate` into its own transform and reads it as 0 px on an image that hasn't loaded yet. The dabs use `xPercent`/`yPercent`.
+- **Measured artwork:** `MEDALLIONS.alpona` is the alpona's empty centre, and `.disc` is the rice-white disc that `.crest--disc` draws over it so small tokens get larger initials. The mehedi palm's empty circle sits at (37.5%, 55.96%) of the image and is 44.2% of its width across; `.palm-box` and `.date` in `holud/css/style.css` depend on that. Re-measure if you replace `alpona.webp` or `mehedi-palm.png`.
+- The curtain is built in JS (`buildCurtain`, seeded so it is the same every visit): 11, 16 or 22 strands by screen width. On phones the parted strands tuck almost off-screen so the venue text stays clear.
+
 ## Assets
-All artwork and films were generated in Higgsfield. The originals live in `assets/raw/`, which is gitignored and not deployed. Portrait (`-port`) and landscape (`-land`) versions exist for the films and their posters. Music is optional: an mp3 at `assets/audio/music.mp3` (`musicUrl`) makes the music button appear.
+All artwork and films were generated in Higgsfield. The originals live in `assets/raw/` (the holud set in `assets/raw/holud/`), which is gitignored and not deployed. Portrait (`-port`) and landscape (`-land`) versions exist for the films and their posters. Music is optional: an mp3 at `assets/audio/music.mp3` (`musicUrl`) makes the music button appear.

@@ -15,6 +15,17 @@ names and date there too.
 Live site: https://ssanjan123.github.io/wedding-invitation/ (GitHub Pages). Any change pushed to the
 `main` branch goes live within a minute or two.
 
+## The holud invitation
+A separate invitation for the Gaye Holud is in the `holud/` folder and lives at
+https://ssanjan123.github.io/wedding-invitation/holud/. A painted kula holds a card tied with red-and-yellow
+thread; a swipe of turmeric paste writes the names; mehedi is drawn up a palm that holds the date; a curtain of
+marigold strings parts onto the holud stage; the last page asks guests to come dressed in holud and links to the
+wedding invitation. Guests can tap the swipe page to leave a dab of holud.
+
+Edit its wording in `holud/js/config.js`, and its link-preview tags at the top of `holud/index.html`.
+`?to=` works the same way there (the name goes on the tray's tag). The wedding page does not link to it,
+so share the holud link only with holud guests.
+
 ## Personal links
 Add `?to=` to the address to write a guest's name on the envelope:
 `https://your-site/index.html?to=Sarah%20%26%20Tom` shows "For Sarah & Tom".

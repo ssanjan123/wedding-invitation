@@ -1,0 +1,711 @@
+/* ==========================================================================
+   Gaye holud invitation
+   Layout contract (same as the wedding page): without .motion (reduced motion /
+   no JS) every scene is a normal full-height section in reading order. With
+   .motion the first three scenes are stacked inside one pinned stage and driven
+   by js/main.js.
+   ========================================================================== */
+
+@property --reveal { syntax: "<number>"; inherits: false; initial-value: 1; }
+@property --sweep { syntax: "<number>"; inherits: false; initial-value: 1; }
+
+:root {
+  --turmeric-700: #9A6406;
+  --turmeric-600: #C98A0B;
+  --turmeric-500: #E9A410;
+  --turmeric-300: #F6CE5B;
+  --paper: #FBEFC4;
+  --rice: #FFF8EA;
+  --marigold: #E0700E;
+  --leaf-950: #0E2415;
+  --leaf-900: #1E3F20;
+  --leaf-700: #2F6B2F;
+  --vermilion: #B3261E;
+  --henna: #6B3410;
+  --ink: var(--leaf-900);
+
+  --holud-foil: linear-gradient(100deg, #8A5A00 0%, #D99A12 30%, #FFD66B 46%, #C98A0B 62%, #7A4A00 100%);
+  --holud-foil-deep: linear-gradient(100deg, #5E3A00 0%, #9A6406 30%, #D4960F 46%, #8A5A00 62%, #4F3000 100%);
+
+  --script: "Imperial Script", "Snell Roundhand", cursive;
+  --serif: "Cormorant Garamond", Cormorant, Garamond, Georgia, serif;
+  --bangla: "Galada", "Noto Serif Bengali", "Hind Siliguri", cursive;
+
+  --tray-w: min(94vw, 700px, 84svh);
+  --palm-w: min(104vw, 460px, 100svh * 1.02 / 1.983);
+  --gutter: 16px;
+  color-scheme: light;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-stopped { overflow: clip; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 18px;
+  line-height: 1.55;
+  font-variant-numeric: lining-nums;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img { display: block; max-width: 100%; }
+p, h1, h2 { margin: 0; font-weight: inherit; }
+ul { margin: 0; padding: 0; list-style: none; }
+a { color: inherit; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--vermilion); outline-offset: 4px; border-radius: 4px; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* Gold-turmeric foil type ---------------------------------------------------- */
+.date__digit span span, .signoff__names, .dress__bangla, .card__names {
+  background-image: var(--holud-foil-deep);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Alpona medallion with initials ------------------------------------------- */
+.crest { position: relative; display: grid; place-items: center; margin-inline: auto; }
+.crest > * { grid-area: 1 / 1; }
+.crest img { width: 100%; height: auto; }
+.monogram { font-family: var(--script); line-height: 1; white-space: nowrap; color: var(--leaf-900); }
+.monogram small { font-size: .62em; margin: 0 .04em; }
+/* once js/main.js has measured them, each letter is placed individually around the medallion centre */
+.monogram.is-fitted { position: relative; width: 0; height: 0; padding: 0; }
+.is-fitted > i { position: absolute; font-style: normal; line-height: 1; white-space: nowrap; }
+.monogram.is-fitted > i:nth-child(2) { color: var(--vermilion); }
+/* small tokens: a rice-white disc covers the alpona's inner rings so the initials can be larger */
+.crest--disc::after {
+  content: ""; grid-area: 1 / 1; z-index: 1; width: 44%; aspect-ratio: 1; border-radius: 50%; margin-top: -.6%;
+  background: var(--rice) url("../assets/img/paper.webp") center / 200px;
+  box-shadow: inset 0 0 0 1.2cqw var(--vermilion), inset 0 0 0 1.9cqw var(--rice), inset 0 0 0 2.4cqw var(--leaf-700);
+}
+.crest--disc .monogram { z-index: 2; }
+
+/* the alpona is drawn round: a conic mask follows --sweep from 0 to 1 */
+.corner, .crest--closing img {
+  -webkit-mask-image: conic-gradient(#000 calc(var(--sweep) * 380deg - 20deg), transparent calc(var(--sweep) * 380deg));
+  mask-image: conic-gradient(#000 calc(var(--sweep) * 380deg - 20deg), transparent calc(var(--sweep) * 380deg));
+}
+
+/* ==========================================================================
+   Chrome: preloader, progress line, dust, controls
+   ========================================================================== */
+.preloader { display: none; }
+.js .preloader {
+  position: fixed; inset: 0; z-index: 100;
+  display: grid; place-items: center;
+  background: radial-gradient(ellipse at 50% 45%, var(--turmeric-300), var(--turmeric-500) 75%);
+  transition: opacity 1s ease, visibility 0s linear 1s;
+}
+.preloader > * { grid-area: 1 / 1; }
+.crest--loader { width: 150px; }
+.preloader__ring { width: 204px; height: 204px; rotate: -90deg; }
+.preloader__ring circle {
+  fill: none; stroke: var(--leaf-900); stroke-width: .6; opacity: .85;
+  stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--load, 0));
+  transition: stroke-dashoffset .5s ease;
+}
+.is-ready .preloader { opacity: 0; visibility: hidden; }
+
+.progress { position: fixed; inset: 0 0 auto; height: 3px; z-index: 30; pointer-events: none; }
+.progress span {
+  display: block; height: 100%; background: linear-gradient(90deg, var(--turmeric-500), var(--marigold), var(--vermilion));
+  transform-origin: 0 50%; transform: scaleX(var(--p, 0));
+}
+
+.dust { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 20; pointer-events: none; mix-blend-mode: screen; }
+
+.controls { position: fixed; inset: 0; z-index: 40; pointer-events: none; }
+.skip {
+  position: absolute; top: max(14px, env(safe-area-inset-top)); right: var(--gutter);
+  pointer-events: auto;
+  font-style: italic; font-size: 17px; font-weight: 500; letter-spacing: .01em; color: var(--leaf-950);
+  padding: 8px 4px; text-decoration: underline; text-decoration-thickness: 1px;
+  text-underline-offset: 5px; text-decoration-color: rgba(14, 36, 21, .45);
+  padding: 6px 14px; border-radius: 999px;
+  background: rgba(255, 248, 234, .72);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}
+.skip:hover { text-decoration-color: var(--leaf-950); }
+html:not(.motion) .skip { display: none; }
+.music {
+  position: absolute; right: var(--gutter); bottom: max(16px, env(safe-area-inset-bottom));
+  pointer-events: auto;
+  width: 46px; height: 46px; border-radius: 50%;
+  display: grid; place-items: center;
+  border: 1px solid rgba(30, 63, 32, .45);
+  background: rgba(255, 248, 234, .7);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}
+.music svg { width: 22px; height: 22px; fill: none; stroke: var(--leaf-900); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.music[aria-pressed="true"] .music__off { display: none; }
+.music[hidden] { display: none; }
+
+/* Buttons -------------------------------------------------------------------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .4em;
+  min-height: 48px; padding: 12px 30px;
+  border-radius: 999px;
+  font-size: 18px; font-weight: 500; letter-spacing: .02em;
+  text-decoration: none;
+  transition: transform .25s ease, box-shadow .25s ease, background-color .25s ease;
+}
+.btn--ghost {
+  color: var(--turmeric-300);
+  box-shadow: inset 0 0 0 1px rgba(246, 206, 91, .65);
+  background: rgba(14, 36, 21, .35);
+}
+.btn--ghost:hover { background: rgba(246, 206, 91, .14); }
+.btn--leaf {
+  color: var(--rice); background: var(--leaf-900);
+  box-shadow: inset 0 0 0 1px rgba(246, 206, 91, .5), 0 10px 26px -14px rgba(14, 36, 21, .8);
+}
+.btn--leaf:hover { transform: translateY(-1px); background: var(--leaf-700); }
+
+/* ==========================================================================
+   Stage & scenes
+   ========================================================================== */
+.stage { position: relative; }
+.scene { position: relative; min-height: 100vh; min-height: 100svh; overflow: hidden; }
+
+/* its own stacking context, so the closing page (z-index 2) always rises above everything in it */
+.motion .stage { height: 100vh; height: 100svh; overflow: hidden; isolation: isolate; }
+.motion .scene { position: absolute; inset: 0; min-height: 0; }
+.motion .scene--stage { z-index: 1; }
+.motion .scene--holud { z-index: 2; }
+.motion .curtain { z-index: 3; }
+.motion .scene--tray { z-index: 4; }
+
+/* Still mode shows the story in reading order: tray, holud and mehedi, stage */
+.stage { display: flex; flex-direction: column; }
+.scene--tray { order: 1; }
+.scene--holud { order: 2; }
+.scene--stage { order: 3; }
+
+/* Full-bleed media (posters + video) ----------------------------------------- */
+.cloth, .film { position: absolute; inset: 0; overflow: hidden; }
+.cloth picture, .film picture,
+.cloth video, .film video { position: absolute; inset: 0; width: 100%; height: 100%; }
+.cloth img, .film img,
+.cloth video, .film video { width: 100%; height: 100%; object-fit: cover; }
+.cloth video { opacity: 0; transition: opacity 1.2s ease; }
+.cloth.is-playing video { opacity: 1; }
+
+/* ==========================================================================
+   Page 1: the holud tray
+   ========================================================================== */
+.scene--tray { display: grid; place-items: center; background: var(--turmeric-500); }
+.cloth__shade {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 72% 62% at 50% 50%, transparent 45%, rgba(70, 35, 0, .38) 100%);
+}
+
+.tray-float { position: relative; z-index: 2; }
+.motion .tray-float { animation: bob 6s ease-in-out infinite; }
+.tray-float.is-still { animation-play-state: paused; }
+@keyframes bob { 50% { translate: 0 -6px; } }
+
+.tray {
+  position: relative;
+  width: var(--tray-w);
+  aspect-ratio: 1200 / 1248;
+  container-type: inline-size;
+}
+.kula {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  filter: drop-shadow(0 14px 18px rgba(70, 35, 0, .45));
+}
+.bati {
+  position: absolute; left: -9%; bottom: -5%; width: 30%; height: auto; rotate: -8deg;
+  filter: drop-shadow(0 10px 12px rgba(70, 35, 0, .45));
+}
+
+/* the invitation: a card with two jamdani doors, tied shut with red-and-yellow thread */
+.card {
+  --cw: 50cqw;
+  position: absolute; left: 50%; top: 51%; width: var(--cw); aspect-ratio: 5 / 7;
+  margin: calc(var(--cw) * -.7) 0 0 calc(var(--cw) * -.5);
+  z-index: 2;
+  container-type: inline-size;
+  transform-origin: 50% 50%;
+}
+.card__inside {
+  position: absolute; inset: 0; border-radius: 2px;
+  background: var(--paper) url("../assets/img/paper.webp") center / 400px;
+  box-shadow: 0 0 0 1px rgba(107, 52, 16, .2), 0 16px 30px -10px rgba(70, 35, 0, .6);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3cqw;
+  text-align: center;
+}
+.card__frame {
+  position: absolute; inset: 5%;
+  border: 1px solid rgba(179, 38, 30, .55); outline: 1px solid rgba(47, 107, 47, .45); outline-offset: -5px;
+  pointer-events: none;
+}
+.card__bangla { font-family: var(--bangla); font-size: 17cqw; line-height: 1.35; color: var(--vermilion); }
+.card__names { font-family: var(--script); font-size: 13cqw; line-height: 1.15; padding: 0 .2em; }
+.card__date { font-size: max(11px, 5.4cqw); letter-spacing: .08em; color: var(--henna); }
+
+.door {
+  position: absolute; top: 0; bottom: 0; width: 50%; z-index: 2;
+  transform-style: preserve-3d;
+}
+.door--l { left: 0; transform-origin: 0 50%; }
+.door--r { right: 0; transform-origin: 100% 50%; }
+.door__face, .door__back {
+  position: absolute; inset: 0;
+  -webkit-backface-visibility: hidden; backface-visibility: hidden;
+}
+.door__face {
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0) 70%, rgba(70, 35, 0, .22)),
+    url("../assets/img/jamdani.webp") center / 46cqw;
+  box-shadow: inset 0 0 0 1.3cqw var(--vermilion), inset 0 0 0 1.9cqw var(--turmeric-300), inset 0 0 0 2.3cqw var(--leaf-900), 0 10px 22px -10px rgba(70, 35, 0, .55);
+}
+.door--r .door__face { background: linear-gradient(270deg, rgba(0, 0, 0, 0) 70%, rgba(70, 35, 0, .22)), url("../assets/img/jamdani.webp") center / 46cqw; }
+.door--l .door__face { border-radius: 2px 0 0 2px; }
+.door--r .door__face { border-radius: 0 2px 2px 0; }
+.door__back { transform: rotateY(180deg); background: var(--paper) url("../assets/img/paper.webp") center / 400px; }
+
+.cord { position: absolute; left: -2%; right: -2%; top: 50%; height: 3.6cqw; translate: 0 -50%; z-index: 4; pointer-events: none; }
+.cord__side {
+  position: absolute; top: 0; bottom: 0; width: 50%;
+  background: repeating-linear-gradient(62deg, var(--vermilion) 0 2.6cqw, var(--turmeric-300) 2.6cqw 4.6cqw, var(--vermilion) 4.6cqw 5.2cqw);
+  box-shadow: 0 2px 3px rgba(70, 35, 0, .45), inset 0 -1px 0 rgba(0, 0, 0, .25);
+  border-radius: 99px;
+}
+.cord__side--l { left: 0; }
+.cord__side--r { right: 0; }
+
+.knot { position: absolute; left: 50%; top: 50%; width: 84cqw; aspect-ratio: 120 / 80; margin: -28cqw 0 0 -42cqw; z-index: 5; display: grid; place-items: center; }
+.knot > * { grid-area: 1 / 1; }
+.knot__bow { width: 100%; height: auto; overflow: visible; translate: 0 8%; filter: drop-shadow(0 2px 2px rgba(70, 35, 0, .45)); }
+.knot__bow path { fill: none; stroke: url(#twist); stroke-width: 5.5; stroke-linecap: round; stroke-linejoin: round; }
+.crest--knot { width: 50cqw; container-type: inline-size; filter: drop-shadow(0 4px 6px rgba(70, 35, 0, .5)); }
+/* a rice-white disc behind the painted ring, so the token reads as one solid piece */
+.crest--knot::before { content: ""; grid-area: 1 / 1; width: 94%; aspect-ratio: 1; border-radius: 50%; background: var(--rice) url("../assets/img/paper.webp") center / 300px; }
+
+.tag { position: absolute; left: 50%; top: 58%; width: 70cqw; z-index: 6; rotate: -7deg; transform-origin: 20% 0; }
+.tag__string { position: absolute; left: 12%; top: -10cqw; width: 2cqw; height: 13cqw; overflow: visible; rotate: -18deg; }
+.tag__string line { stroke: var(--vermilion); stroke-width: 1.4; vector-effect: non-scaling-stroke; }
+.tag__paper {
+  position: relative;
+  padding: 7cqw 7cqw 7cqw 12cqw;
+  background: var(--rice) url("../assets/img/paper.webp") center / 300px;
+  clip-path: polygon(9% 0, 100% 0, 100% 100%, 9% 100%, 0 50%);
+  filter: drop-shadow(0 6px 8px rgba(70, 35, 0, .45));
+  box-shadow: inset 0 0 0 1px rgba(179, 38, 30, .35);
+}
+.tag__paper::before {   /* the eyelet */
+  content: ""; position: absolute; left: 5%; top: 50%; width: 4cqw; aspect-ratio: 1; translate: -50% -50%;
+  border-radius: 50%; background: var(--turmeric-500); box-shadow: inset 0 0 0 1px var(--turmeric-700);
+}
+.guest {
+  font-family: var(--script); font-size: max(17px, 11cqw); line-height: 1.12; color: var(--leaf-900);
+  text-wrap: balance;
+}
+
+@container (max-width: 480px) {
+  .card { --cw: 56cqw; }
+}
+
+.scroll-cue {
+  position: absolute; left: 0; right: 0; bottom: max(24px, env(safe-area-inset-bottom));
+  z-index: 4; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  font-style: italic; font-weight: 500; font-size: 18px; color: var(--leaf-950);
+  width: fit-content; margin-inline: auto; padding: 6px 18px 4px; border-radius: 999px;
+  background: rgba(255, 248, 234, .72);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}
+.scroll-cue svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.6; animation: nudge 2.4s ease-in-out infinite; }
+@keyframes nudge { 50% { translate: 0 5px; } }
+html:not(.motion) .scroll-cue { display: none; }
+
+/* ==========================================================================
+   Pages 2 and 3: the holud swipe and the mehedi palm
+   ========================================================================== */
+.scene--holud { background: var(--paper); color: var(--ink); }
+.holud-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 45%, rgba(255, 250, 230, .75), transparent 70%),
+    var(--paper) url("../assets/img/paper.webp") center / 512px;
+}
+
+/* alpona painted into the four corners */
+.corner {
+  --cw: clamp(170px, 40vmin, 440px);
+  position: absolute; z-index: 1; width: var(--cw); height: auto; max-width: none;
+  margin: calc(var(--cw) * -.50375) 0 0 calc(var(--cw) * -.5);
+  opacity: .92; pointer-events: none;
+}
+.corner--tl { left: 0; top: 0; }
+.corner--tr { left: 100%; top: 0; }
+.corner--bl { left: 0; top: 100%; }
+.corner--br { left: 100%; top: 100%; }
+
+/* marigold strings hanging from the top edge */
+.garland { position: absolute; z-index: 3; top: -2%; width: auto; transform-origin: 50% 0; pointer-events: none; filter: drop-shadow(0 6px 6px rgba(70, 35, 0, .3)); }
+.garland--1 { left: 5%; height: 40svh; }
+.garland--2 { left: 10%; height: 27svh; }
+.garland--3 { right: 10%; height: 27svh; }
+.garland--4 { right: 5%; height: 40svh; }
+@media (min-aspect-ratio: 5 / 4) {
+  .garland--1 { left: 17%; } .garland--2 { left: 22%; }
+  .garland--3 { right: 22%; } .garland--4 { right: 17%; }
+}
+@media (max-aspect-ratio: 3 / 4) {
+  .garland--2, .garland--3 { display: none; }
+  .garland--1 { left: 3%; height: 24svh; } .garland--4 { right: 3%; height: 24svh; }
+}
+html:not(.motion) .garland { display: none; }
+
+.dabs, .closing__dabs { position: absolute; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
+.dab { position: absolute; width: clamp(46px, 9vmin, 84px); height: auto; max-width: none; mix-blend-mode: multiply; }
+.dab-petal { position: absolute; width: 14px; height: auto; max-width: none; }
+
+/* Beat A: the swipe of holud and the names */
+.sheet {
+  position: relative; z-index: 4;
+  width: min(90vw, 600px, 94svh);   /* the content is about as tall as the sheet is wide */
+  margin: 0 auto;
+  container-type: inline-size;
+  display: flex; flex-direction: column; align-items: center; gap: 1.4cqw;
+  text-align: center;
+}
+.motion .sheet { position: absolute; left: 50%; top: 50%; translate: -50% -50%; }
+.hosts, .of, .request { font-style: italic; color: var(--henna); }
+.hosts { font-size: max(16px, 4.5cqw); line-height: 1.35; }
+.swipe { position: relative; width: 116cqw; height: 34cqw; margin: -1cqw 0; display: grid; place-items: center; }
+.swipe__paste {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill;
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(var(--reveal) * 125% - 25%), transparent calc(var(--reveal) * 125%));
+  mask-image: linear-gradient(90deg, #000 calc(var(--reveal) * 125% - 25%), transparent calc(var(--reveal) * 125%));
+}
+.swipe__text { position: relative; display: flex; flex-direction: column; align-items: center; margin: 0; font-weight: 400; translate: 0 2%; }
+.swipe__bangla {
+  font-family: var(--bangla); font-size: 16cqw; line-height: 1.3; color: var(--leaf-950);
+  padding: 0 .3em;
+  text-shadow: 0 1px 0 rgba(255, 236, 170, .55);
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(var(--reveal) * 130% - 30%), transparent calc(var(--reveal) * 130%));
+  mask-image: linear-gradient(90deg, #000 calc(var(--reveal) * 130% - 30%), transparent calc(var(--reveal) * 130%));
+}
+.swipe__name { margin-top: -1.6cqw; font-size: max(12px, 3.3cqw); font-weight: 600; letter-spacing: .32em; text-transform: uppercase; color: var(--leaf-950); padding-left: .32em; }
+.of { font-size: max(16px, 4.5cqw); line-height: 1; }
+.names { display: flex; flex-direction: column; align-items: center; line-height: .98; }
+.names__one, .names__two {
+  display: inline-block;
+  font-family: var(--script); font-size: 12cqw; color: var(--leaf-900); white-space: nowrap; word-spacing: .14em;
+  padding: .12em .35em; margin: -.12em -.35em;
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(var(--reveal) * 130% - 30%), transparent calc(var(--reveal) * 130%));
+  mask-image: linear-gradient(90deg, #000 calc(var(--reveal) * 130% - 30%), transparent calc(var(--reveal) * 130%));
+}
+.names__amp { font-family: var(--script); font-size: 7.5cqw; line-height: 1.1; color: var(--vermilion); padding: 0 .3em; }
+.request { max-width: 78cqw; font-size: max(16px, 4.3cqw); line-height: 1.35; text-wrap: balance; }
+.tap-hint {
+  margin-top: 2cqw; font-size: max(13px, 3.2cqw); letter-spacing: .05em; color: var(--turmeric-700);
+  display: inline-flex; align-items: center; gap: .6em;
+}
+.tap-hint::before { content: ""; width: .8em; height: .8em; border-radius: 50%; background: var(--turmeric-500); box-shadow: 0 0 0 3px rgba(233, 164, 16, .25); }
+html:not(.motion) .tap-hint { display: none; }
+@media (max-aspect-ratio: 3 / 4) {
+  .sheet { gap: 2.6cqw; }
+  .hosts, .of { font-size: 5.2cqw; }
+  .swipe { height: 42cqw; }
+  .swipe__bangla { font-size: 19.5cqw; }
+  .swipe__name { font-size: 3.8cqw; }
+  .names__one, .names__two { font-size: 14cqw; }
+  .names__amp { font-size: 9cqw; }
+  .request { font-size: 5cqw; max-width: 86cqw; }
+  .tap-hint { font-size: 3.8cqw; margin-top: 4cqw; }
+}
+
+/* Beat B: mehedi drawn up a palm, the date in its centre */
+.palm-box {
+  position: relative; z-index: 4;
+  width: var(--palm-w);
+  aspect-ratio: 880 / 1745;
+  container-type: inline-size;
+}
+/* the empty circle in the palm is at (37.5%, 55.96%), 44.2% of the image's width across */
+.motion .palm-box {
+  position: absolute;
+  left: calc(50vw - var(--palm-w) * .375);
+  top: calc(46svh - var(--palm-w) * 1.983 * .5596);
+}
+.palm {
+  width: 100%; height: auto;
+  -webkit-mask-image: linear-gradient(0deg, #000 calc(var(--reveal) * 120% - 20%), transparent calc(var(--reveal) * 120%));
+  mask-image: linear-gradient(0deg, #000 calc(var(--reveal) * 120% - 20%), transparent calc(var(--reveal) * 120%));
+}
+.date {
+  position: absolute; left: 15.4cqw; top: calc(55.96% - 22.1cqw); width: 44.2cqw; aspect-ratio: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+}
+.date__weekday { font-style: italic; font-size: max(13px, 4.8cqw); line-height: 1.1; color: var(--henna); }
+.date__day { font-size: 19cqw; font-weight: 500; line-height: 1; letter-spacing: -.01em; padding: .02em .08em 0; }
+.date__digits { display: inline-flex; }
+.date__digit { display: inline-block; height: 1em; overflow: hidden; clip-path: inset(0 -.2em); }
+.date__digit > span { display: flex; flex-direction: column; }
+.date__digit > span > span { display: block; height: 1em; line-height: 1; }
+.date__month { font-size: max(12px, 4.3cqw); font-weight: 600; letter-spacing: .06em; line-height: 1.2; color: var(--leaf-900); white-space: nowrap; }
+
+/* the groom's name, hidden along the index finger */
+.hidden-name {
+  position: absolute; left: 53.6%; top: 25%;
+  rotate: -86deg; transform-origin: 0 50%;
+  font-family: var(--script); font-size: max(15px, 5.2cqw); line-height: 1; color: var(--henna);
+  padding: 6px 8px;
+  transition: color .4s ease, text-shadow .4s ease, scale .4s ease;
+}
+.hidden-name.is-found { color: var(--vermilion); scale: 1.35; text-shadow: 0 0 10px rgba(246, 206, 91, .95), 0 0 2px var(--rice); }
+.hidden-name[hidden] { display: none; }
+
+.date-foot {
+  position: relative; z-index: 5;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 0 var(--gutter) max(22px, env(safe-area-inset-bottom));
+  text-align: center;
+}
+.motion .date-foot {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding-top: 13svh;
+  background: linear-gradient(to bottom, rgba(251, 239, 196, 0), rgba(251, 239, 196, .94) 42%);
+}
+.date__time { font-style: italic; font-size: 20px; line-height: 1.3; color: var(--henna); }
+.countdown { max-width: 30rem; font-size: 16px; line-height: 1.4; color: var(--leaf-900); font-variant-numeric: lining-nums tabular-nums; text-wrap: balance; }
+.countdown b { font-weight: 600; }
+.mehedi-hint { max-width: 26rem; font-style: italic; font-size: 15px; line-height: 1.35; color: var(--turmeric-700); text-wrap: balance; transition: color .4s ease; }
+.mehedi-hint.is-found { color: var(--vermilion); font-weight: 500; }
+.mehedi-hint[hidden] { display: none; }
+
+/* wide screens: the palm sits left of centre and the time and countdown stand beside it */
+@media (min-aspect-ratio: 5 / 4) {
+  .motion .palm-box { left: calc(38vw - var(--palm-w) * .375); top: calc(50svh - var(--palm-w) * 1.983 * .5596); }
+  .motion .date-foot {
+    left: 58vw; right: 5vw; top: 0; bottom: 0;
+    padding: 0; background: none; align-items: flex-start; justify-content: center; text-align: left; gap: 10px;
+  }
+  .date__time { font-size: clamp(22px, 2.3vw, 30px); }
+  .countdown { font-size: 18px; }
+  .mehedi-hint { font-size: 17px; }
+}
+
+/* Still mode: the swipe, then the palm, then its caption */
+html:not(.motion) .scene--holud { padding: 8svh 0 6svh; }
+html:not(.motion) .palm-box { margin: 8svh auto 0; width: min(80vw, 400px); translate: 6% 0; }
+html:not(.motion) .date-foot { margin-top: 18px; }
+
+/* ==========================================================================
+   Page 4: the marigold curtain and the holud stage
+   ========================================================================== */
+.curtain { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+html:not(.motion) .curtain { display: none; }
+.strand {
+  position: absolute; top: -1%; z-index: 1;
+  height: calc(100svh * var(--len, 1.1)); width: auto; max-width: none;
+  margin-left: calc(100svh * var(--len, 1.1) * -115 / 3200);   /* half the strand's width (115 x 1600 image) */
+  transform-origin: 50% 0;
+  filter: drop-shadow(0 8px 8px rgba(40, 18, 0, .45));
+}
+.strand--back { z-index: 0; filter: brightness(.8) drop-shadow(0 6px 6px rgba(40, 18, 0, .35)); }
+
+.scene--stage { background: var(--leaf-950); display: flex; flex-direction: column; align-items: center; }
+.film__video { opacity: 0; }
+.film.is-ready .film__video { opacity: 1; }
+.film.is-ready .film__poster { visibility: hidden; }
+.film__poster--end { opacity: 0; }
+.film__shade {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 70% 38% at 50% 12%, rgba(30, 14, 0, .55), transparent 70%),
+    linear-gradient(to bottom, rgba(30, 14, 0, .7), rgba(30, 14, 0, .15) 34%, transparent 50%, rgba(14, 36, 21, .5) 76%, rgba(14, 36, 21, .85));
+}
+
+.venue-title {
+  position: relative; z-index: 2; text-align: center;
+  padding: calc(max(56px, env(safe-area-inset-top)) + 6svh) var(--gutter) 0;
+  color: var(--rice);
+  text-shadow: 0 2px 18px rgba(0, 0, 0, .65);
+}
+.venue-title__lead { font-style: italic; font-size: clamp(17px, 2.2vw, 24px); }
+.venue-title__name {
+  margin-top: 4px; font-size: clamp(38px, 6.4vw, 84px); font-weight: 500; line-height: 1.05;
+  color: var(--turmeric-300); text-wrap: balance;
+}
+
+.venue-card {
+  position: relative; z-index: 2;
+  width: min(100% - 2 * var(--gutter), 540px);
+  margin: auto auto max(20px, env(safe-area-inset-bottom));
+  padding: 46px 28px 26px;
+  text-align: center; color: var(--rice);
+  border-radius: 50% 50% 14px 14px / 70px 70px 14px 14px;
+  background: linear-gradient(to bottom, rgba(30, 63, 32, .78), rgba(14, 36, 21, .9));
+  box-shadow: inset 0 0 0 1px rgba(246, 206, 91, .55), inset 0 0 0 6px rgba(14, 36, 21, .3), inset 0 0 0 7px rgba(179, 38, 30, .45);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+.venue-card__name { font-size: clamp(24px, 3vw, 30px); font-weight: 500; color: var(--turmeric-300); line-height: 1.2; }
+.venue-card__address { margin-top: 4px; font-size: 18px; opacity: .92; text-wrap: balance; }
+.venue-card__when { margin-top: 2px; font-style: italic; font-size: 18px; opacity: .92; }
+.venue-card .btn { margin-top: 16px; }
+
+.evening { position: relative; margin: 22px auto 0; width: fit-content; }
+.evening[hidden] { display: none; }
+.evening__line { position: absolute; left: 50%; top: 10px; bottom: 10px; width: 2px; height: calc(100% - 20px); translate: -1px 0; overflow: visible; }
+.evening__line line { stroke: var(--turmeric-500); stroke-width: 1; vector-effect: non-scaling-stroke; stroke-dasharray: 1; stroke-dashoffset: 0; }
+.evening__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.evening__list li { display: grid; grid-template-columns: 1fr 22px 1fr; align-items: center; column-gap: 10px; font-size: 18px; }
+.evening__list time { text-align: right; color: var(--turmeric-300); font-variant-numeric: lining-nums tabular-nums; }
+.evening__list i { justify-self: center; width: 7px; height: 7px; rotate: 45deg; background: var(--turmeric-500); box-shadow: 0 0 0 3px rgba(14, 36, 21, .9); }
+.evening__list span { text-align: left; }
+
+html:not(.motion) .scene--stage { min-height: 100svh; }
+
+/* ==========================================================================
+   Page 5: come in holud
+   ========================================================================== */
+.closing {
+  --arch-rise: min(12vh, 120px);
+  position: relative; z-index: 2; overflow: hidden;
+  min-height: 100vh; min-height: 100svh;
+  display: flex; flex-direction: column; align-items: center;
+  padding: calc(var(--arch-rise) + 30px) var(--gutter) 0;
+  text-align: center; color: var(--ink);
+  background:
+    radial-gradient(ellipse 70% 45% at 50% 26%, rgba(255, 250, 230, .85), transparent 70%),
+    var(--paper) url("../assets/img/paper.webp") center top / 512px;
+  border-radius: 50% 50% 0 0 / var(--arch-rise) var(--arch-rise) 0 0;
+  box-shadow: 0 -30px 70px -24px rgba(0, 0, 0, .55);
+}
+/* rises over the last moments of the stage film */
+.motion .closing { margin-top: -30vh; }
+/* a vermilion and leaf-green border follows the arched top edge, like an alpona band */
+.closing::before, .closing::after {
+  content: ""; position: absolute; left: 12px; right: 12px; height: 60%;
+  border-bottom: 0;
+  -webkit-mask-image: linear-gradient(#000 30%, transparent);
+  mask-image: linear-gradient(#000 30%, transparent);
+  pointer-events: none;
+}
+.closing::before { top: 12px; border: 2px solid rgba(179, 38, 30, .7); border-bottom: 0; border-radius: 50% 50% 0 0 / calc(var(--arch-rise) - 8px) calc(var(--arch-rise) - 8px) 0 0; }
+.closing::after { top: 19px; left: 19px; right: 19px; border: 1px solid rgba(47, 107, 47, .6); border-bottom: 0; border-radius: 50% 50% 0 0 / calc(var(--arch-rise) - 14px) calc(var(--arch-rise) - 14px) 0 0; }
+
+.petals { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+
+.closing__content {
+  position: relative; z-index: 2;
+  width: 100%; max-width: 38rem;
+  display: flex; flex-direction: column; align-items: center;
+}
+.crest--closing { width: min(220px, 58vw); container-type: inline-size; }
+
+.dress__bangla {
+  margin-top: 8px;
+  font-family: var(--bangla); font-size: clamp(72px, 18vw, 136px); line-height: 1.35;
+  padding: 0 .25em;
+  filter: drop-shadow(0 1px 0 rgba(255, 248, 230, .9));
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(var(--reveal) * 130% - 30%), transparent calc(var(--reveal) * 130%));
+  mask-image: linear-gradient(90deg, #000 calc(var(--reveal) * 130% - 30%), transparent calc(var(--reveal) * 130%));
+}
+.dress__title { margin-top: -6px; font-size: clamp(28px, 4.2vw, 42px); font-weight: 500; line-height: 1.15; color: var(--leaf-900); text-wrap: balance; }
+.dress__note { margin-top: 6px; font-style: italic; font-size: clamp(18px, 2.1vw, 21px); color: var(--henna); text-wrap: balance; }
+
+.swatches { display: flex; justify-content: center; gap: clamp(18px, 5vw, 34px); margin-top: 24px; }
+.swatch { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.swatch i {
+  display: block; width: clamp(64px, 17vw, 84px); aspect-ratio: 1; border-radius: 50%;
+  background: var(--c) url("../assets/img/paper.webp") center / 160px;
+  background-blend-mode: multiply;
+  box-shadow: 0 8px 16px -8px rgba(70, 35, 0, .6), inset 0 0 0 1px rgba(0, 0, 0, .12);
+  outline: 2px dashed rgba(255, 248, 234, .85); outline-offset: -8px;   /* kantha running stitch */
+}
+.swatch span { font-style: italic; font-size: 17px; color: var(--henna); }
+.swatch--holud { --c: var(--turmeric-500); }
+.swatch--genda { --c: var(--marigold); }
+.swatch--pata { --c: var(--leaf-700); }
+
+.rule { display: flex; align-items: center; gap: 12px; width: min(240px, 64vw); margin: 34px auto 26px; }
+.rule::before, .rule::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--vermilion)); }
+.rule::after { transform: scaleX(-1); }
+.rule i { width: 8px; height: 8px; border-radius: 50%; background: var(--turmeric-500); box-shadow: 0 0 0 3px rgba(233, 164, 16, .25); }
+
+.message { max-width: 33rem; font-size: clamp(18px, 2vw, 20px); line-height: 1.75; color: var(--ink); text-wrap: pretty; }
+.message p + p { margin-top: 14px; }
+
+.signoff { margin-top: 30px; font-style: italic; font-size: 19px; color: var(--henna); }
+.signoff__names { word-spacing: .1em; font-family: var(--script); font-size: clamp(44px, 6vw, 58px); line-height: 1.25; padding: 0 .3em; }
+.signoff__families { font-style: italic; font-size: 18px; color: var(--henna); }
+
+.save-date {
+  margin-top: 28px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 14px;
+  font-size: 17px;
+}
+.save-date a {
+  color: var(--leaf-900); text-decoration: underline; text-decoration-thickness: 1px;
+  text-underline-offset: 5px; text-decoration-color: rgba(201, 138, 11, .7);
+}
+.save-date a:hover { text-decoration-color: var(--leaf-900); }
+.save-date i { width: 5px; height: 5px; border-radius: 50%; background: var(--turmeric-600); }
+
+.wedding-link {
+  margin-top: 40px; padding: 24px 20px 0;
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  border-top: 1px solid rgba(179, 38, 30, .3);
+}
+.wedding-link[hidden] { display: none; }
+.wedding-link__lead { font-style: italic; font-size: 19px; color: var(--henna); text-wrap: balance; }
+
+.closing__footer { position: relative; z-index: 2; margin-top: auto; width: 100%; height: 110px; overflow: hidden; }
+/* one marigold strand laid on its side, as a garland along the foot of the page */
+.closing__footer img {
+  position: absolute; left: 50%; top: 60%;
+  height: min(118vw, 1000px); width: auto; max-width: none;
+  translate: -50% -50%; rotate: 90deg;
+  filter: drop-shadow(0 4px 5px rgba(70, 35, 0, .3));
+}
+
+/* Short landscape screens (phones held sideways): keep the venue card inside the pinned view */
+@media (orientation: landscape) and (max-height: 540px) {
+  .scroll-cue { bottom: 8px; font-size: 15px; }
+  .venue-title { padding-top: 22px; }
+  .venue-card {
+    width: min(100% - 2 * var(--gutter), 720px);
+    padding: 16px 24px; margin-bottom: 12px;
+    border-radius: 18px;
+    display: grid; grid-template-columns: 1fr auto; column-gap: 32px; align-items: center;
+    text-align: left;
+  }
+  .venue-card > p, .venue-card > .btn { grid-column: 1; }
+  .venue-card .btn { justify-self: start; margin-top: 10px; min-height: 42px; padding: 8px 22px; }
+  .evening { grid-column: 2; grid-row: 1 / span 4; margin: 0; }
+  .venue-card__address, .venue-card__when, .evening__list li { font-size: 16px; }
+  .sheet { width: min(64vw, 520px, 90svh); }
+}
+
+/* Small screens -------------------------------------------------------------- */
+@media (max-width: 480px) {
+  body { font-size: 17px; }
+  .venue-title { padding-left: 34px; padding-right: 34px; }
+  .venue-title__name { font-size: 36px; }
+  .venue-card { width: calc(100% - 64px); padding: 42px 20px 22px; }
+  .evening__list li { font-size: 17px; column-gap: 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; }
+}
