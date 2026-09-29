@@ -71,8 +71,6 @@ window.INVITE = {
 
   // The link at the very end. Leave `url` empty to hide it.
   wedding: {
-    lead: "Three evenings later, we marry",
-    when: "Sunday 27 December",
     label: "See the wedding invitation",
     url: "../"
   },
