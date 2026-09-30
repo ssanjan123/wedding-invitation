@@ -511,19 +511,22 @@ html:not(.motion) .date-foot { margin-top: 18px; }
    ========================================================================== */
 .curtain { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
 html:not(.motion) .curtain { display: none; }
+/* The strand images carry their own drop-shadow (and the back row its darkening), because a CSS filter on each
+   moving strand is re-blurred every frame over the film. Each is the 115 x 1600 strand with room for the shadow:
+   20px at the sides, 8 above and 32 below (155 x 1640). Sized and placed so the strand itself sits where it would. */
 .strand {
   position: absolute; top: -1%; z-index: 1;
-  height: calc(100svh * var(--len, 1.1)); width: auto; max-width: none;
-  margin-left: calc(100svh * var(--len, 1.1) * -115 / 3200);   /* half the strand's width (115 x 1600 image) */
-  transform-origin: 50% 0;
-  filter: drop-shadow(0 8px 8px rgba(40, 18, 0, .45));
+  height: calc(100svh * var(--len, 1.1) * 1640 / 1600); width: auto; max-width: none;
+  margin: calc(100svh * var(--len, 1.1) * -8 / 1600) 0 0 calc(100svh * var(--len, 1.1) * -155 / 3200);
+  transform-origin: 50% .5%;
 }
-.strand--back { z-index: 0; filter: brightness(.8) drop-shadow(0 6px 6px rgba(40, 18, 0, .35)); }
+.strand--back { z-index: 0; }
 
 .scene--stage { background: var(--leaf-950); display: flex; flex-direction: column; align-items: center; }
-.film__video { opacity: 0; }
+.film__video { opacity: 0; transition: opacity .5s ease; }
 .film.is-ready .film__video { opacity: 1; }
-.film.is-ready .film__poster { visibility: hidden; }
+/* if the film arrives mid-scroll it fades in over the posters, which stay until it has */
+.film.is-ready .film__poster { visibility: hidden; transition: visibility 0s .5s; }
 .film__poster--end { opacity: 0; }
 .film__shade {
   position: absolute; inset: 0;
@@ -551,9 +554,9 @@ html:not(.motion) .curtain { display: none; }
   padding: 46px 28px 26px;
   text-align: center; color: var(--rice);
   border-radius: 50% 50% 14px 14px / 70px 70px 14px 14px;
-  background: linear-gradient(to bottom, rgba(30, 63, 32, .78), rgba(14, 36, 21, .9));
+  /* opaque enough to need no backdrop blur, which stalls a frame when the card appears and re-blurs every film frame */
+  background: linear-gradient(to bottom, rgba(30, 63, 32, .88), rgba(14, 36, 21, .94));
   box-shadow: inset 0 0 0 1px rgba(246, 206, 91, .55), inset 0 0 0 6px rgba(14, 36, 21, .3), inset 0 0 0 7px rgba(179, 38, 30, .45);
-  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
 }
 .venue-card__name { font-size: clamp(24px, 3vw, 30px); font-weight: 500; color: var(--turmeric-300); line-height: 1.2; }
 .venue-card__address { margin-top: 4px; font-size: 18px; opacity: .92; text-wrap: balance; }

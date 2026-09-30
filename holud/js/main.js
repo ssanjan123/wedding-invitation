@@ -402,7 +402,7 @@
     for (var i = 0; i < n; i++) {
       var im = document.createElement('img');
       var pos = (i + 0.5) / n * 100 + (rnd() - 0.5) * (50 / n);
-      im.src = 'assets/img/marigold-string.webp';
+      im.src = i % 2 ? 'assets/img/strand-back.webp' : 'assets/img/strand-front.webp';   // shadows baked in
       im.alt = '';
       im.className = 'strand' + (i % 2 ? ' strand--back' : '');
       im.style.left = pos.toFixed(2) + '%';

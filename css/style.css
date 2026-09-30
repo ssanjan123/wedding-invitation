@@ -365,6 +365,8 @@ html:not(.motion) .scene--invite { padding: 6svh 0 4svh; }
 .portal { position: relative; }
 .motion .portal { position: absolute; inset: 0; }
 .portal__frame { transform-origin: 50% 60%; z-index: 2; }
+/* zoomed 9x into the doorway: scale it as one layer instead of repainting the masked paper every frame */
+.motion .portal__frame { will-change: transform; }
 
 /* ivory with an arch-shaped hole: stays in place around the opening while the page behind is revealed */
 .portal__paper { display: none; }
@@ -483,9 +485,10 @@ html:not(.motion) .floral--tl, html:not(.motion) .floral--tr, html:not(.motion) 
    Page 3: the venue film
    ========================================================================== */
 .scene--venue { background: var(--maroon-950); display: flex; flex-direction: column; align-items: center; }
-.film__video { opacity: 0; }
+.film__video { opacity: 0; transition: opacity .5s ease; }
 .film.is-ready .film__video { opacity: 1; }
-.film.is-ready .film__poster { visibility: hidden; }
+/* if the film arrives mid-scroll it fades in over the posters, which stay until it has */
+.film.is-ready .film__poster { visibility: hidden; transition: visibility 0s .5s; }
 .film__poster--end { opacity: 0; }
 .film__shade {
   position: absolute; inset: 0;
@@ -512,9 +515,9 @@ html:not(.motion) .floral--tl, html:not(.motion) .floral--tr, html:not(.motion) 
   padding: 48px 28px 26px;
   text-align: center;
   border-radius: 50% 50% 14px 14px / 70px 70px 14px 14px;
-  background: linear-gradient(to bottom, rgba(42, 6, 12, .74), rgba(28, 4, 8, .86));
+  /* opaque enough to need no backdrop blur, which stalls a frame when the card appears and re-blurs every film frame */
+  background: linear-gradient(to bottom, rgba(42, 6, 12, .86), rgba(28, 4, 8, .93));
   box-shadow: inset 0 0 0 1px rgba(241, 217, 138, .45), inset 0 0 0 6px rgba(28, 4, 8, .3), inset 0 0 0 7px rgba(241, 217, 138, .18);
-  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
 }
 .venue-card__name { font-size: clamp(24px, 3vw, 30px); font-weight: 500; color: var(--gold-300); line-height: 1.2; }
 .venue-card__address { margin-top: 4px; font-size: 18px; color: var(--ivory); opacity: .9; text-wrap: balance; }

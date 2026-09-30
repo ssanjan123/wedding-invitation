@@ -43,9 +43,10 @@ window.InviteMedia = (function () {
   }
 
   function Scrub(video) {
+    var FPS = 24;   // the scrub films are 24 fps
     var wrap = video.closest('.film');
     var endPoster = wrap.querySelector('.film__poster--end');
-    var ready = false, loading = false, seeking = false, primed = false, target = 0, objectUrl = null;
+    var ready = false, loading = false, seeking = false, primed = false, target = 0, frame = -1, objectUrl = null;
 
     function attach(url) {
       video.src = url;
@@ -65,12 +66,15 @@ window.InviteMedia = (function () {
         attach(src);
       }
     }
+    // Seek to the middle of the frame for this progress, and only when that frame changes:
+    // a seek that lands on the frame already shown still costs a decode and delays the next one.
     function seek() {
       if (!ready || seeking || !video.duration) return;
-      var t = target * Math.max(0, video.duration - 0.04);
-      if (Math.abs(video.currentTime - t) < 0.02) return;
+      var f = Math.round(target * (Math.round(video.duration * FPS) - 1));
+      if (f === frame) return;
+      frame = f;
       seeking = true;
-      video.currentTime = t;
+      video.currentTime = (f + 0.5) / FPS;
     }
     video.addEventListener('seeked', function () {
       seeking = false;
@@ -91,13 +95,13 @@ window.InviteMedia = (function () {
       primed = true;
       load();
       var p = video.play();
-      if (p && p.then) p.then(function () { video.pause(); seek(); }).catch(function () {});
+      if (p && p.then) p.then(function () { video.pause(); frame = -1; seek(); }).catch(function () {});
     }
     window.addEventListener('touchstart', prime, { once: true, passive: true });
 
     portrait.addEventListener('change', function () {
       if (!loading) return;
-      ready = false; loading = false; seeking = false;
+      ready = false; loading = false; seeking = false; frame = -1;
       wrap.classList.remove('is-ready');
       if (objectUrl) { URL.revokeObjectURL(objectUrl); objectUrl = null; }
       load();
