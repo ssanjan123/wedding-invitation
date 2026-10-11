@@ -484,10 +484,14 @@
       .to(sEnv, { autoAlpha: 0, duration: 0.15 }, 3.3);
 
     /* Page 2, beat A: the arch settles, florals gather, names are written in */
+    // The garlands drop in tilted, then swing straight. The tilt is set before the timeline, not as a
+    // second from-state: the drop's from() restores the transform it saved when it starts, which wiped
+    // a tilt added after it, so they fell straight on the way down and tilted on the way back up.
+    gsap.set(garlands, { rotation: 7 });
     tl.fromTo(frame, { scale: 1.12, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, ease: 'power2.out', duration: 0.8 }, 3.3)
       .from(florals, { xPercent: -40, yPercent: 40, autoAlpha: 0, rotation: -6, ease: 'power2.out', duration: 0.8, stagger: 0.06 }, 3.45)
       .from(garlands, { yPercent: -105, ease: 'power2.out', duration: 0.7, stagger: 0.08 }, 3.55)
-      .fromTo(garlands, { rotation: 7 }, { rotation: 0, ease: 'elastic.out(1, 0.35)', duration: 0.9, stagger: 0.08 }, 3.95)
+      .to(garlands, { rotation: 0, ease: 'elastic.out(1, 0.35)', duration: 0.9, stagger: 0.08 }, 3.95)
       .from(spray, { y: 40, autoAlpha: 0, scale: 0.92, ease: 'power2.out', duration: 0.6 }, 3.7)
       .from(crest, { autoAlpha: 0, scale: 0.85, ease: 'power2.out', duration: 0.45 }, 3.85)
       .from(hosts, { autoAlpha: 0, y: 14, ease: 'power2.out', duration: 0.4 }, 3.95)
@@ -520,6 +524,9 @@
       .to(spray, { y: 40, autoAlpha: 0, ease: 'power2.in', duration: 0.4 }, 7.9)
       .to(invBg, { autoAlpha: 0, duration: 0.35 }, 8.1)
       .fromTo(film, { scale: 1.3 }, { scale: 1, ease: 'power2.out', duration: 1.4 }, 8.1)
+      // one layer for the 9x zoom, so the masked paper isn't repainted every frame. Only for the zoom: left on,
+      // 1x screens kept the zoom's raster, and the names looked soft going down and jagged after scrolling back.
+      .set(frame, { willChange: 'transform' }, 8.3)
       .to(frame, { scale: 9, ease: 'power2.in', duration: 1 }, 8.35)
       .to(arch, { autoAlpha: 0, duration: 0.25 }, 9.1)
       .set(sInv, { autoAlpha: 0 }, 9.36);

@@ -365,8 +365,6 @@ html:not(.motion) .scene--invite { padding: 6svh 0 4svh; }
 .portal { position: relative; }
 .motion .portal { position: absolute; inset: 0; }
 .portal__frame { transform-origin: 50% 60%; z-index: 2; }
-/* zoomed 9x into the doorway: scale it as one layer instead of repainting the masked paper every frame */
-.motion .portal__frame { will-change: transform; }
 
 /* ivory with an arch-shaped hole: stays in place around the opening while the page behind is revealed */
 .portal__paper { display: none; }

@@ -542,9 +542,13 @@
       .to(sTray, { autoAlpha: 0, duration: 0.15 }, 3.2);
 
     /* Page 2, beat A: alpona is drawn in the corners, a swipe of holud writes the names */
+    // The garlands drop in tilted, then swing straight. The tilt is set before the timeline, not as a
+    // second from-state: the drop's from() restores the transform it saved when it starts, which wiped
+    // a tilt added after it, so they fell straight on the way down and tilted on the way back up.
+    gsap.set(garlands, { rotation: 6 });
     tl.fromTo(corners, { '--sweep': 0, rotation: -40 }, { '--sweep': 1, rotation: 0, ease: 'power1.out', duration: 0.9, stagger: 0.07 }, 3.3)
       .from(garlands, { yPercent: -105, ease: 'power2.out', duration: 0.7, stagger: 0.08 }, 3.4)
-      .fromTo(garlands, { rotation: 6 }, { rotation: 0, ease: 'elastic.out(1, 0.35)', duration: 0.9, stagger: 0.08 }, 3.8)
+      .to(garlands, { rotation: 0, ease: 'elastic.out(1, 0.35)', duration: 0.9, stagger: 0.08 }, 3.8)
       .from(hosts, { autoAlpha: 0, y: 14, ease: 'power2.out', duration: 0.4 }, 3.45)
       .fromTo(paste, { '--reveal': 0 }, { '--reveal': 1, ease: 'power1.inOut', duration: 0.6 }, 3.65)
       .fromTo(bangla, { '--reveal': 0 }, { '--reveal': 1, ease: 'power1.inOut', duration: 0.5 }, 3.95)
@@ -587,7 +591,9 @@
         rotation: function (i, el) { return +el.dataset.pos < 50 ? 5 : -5; },
         ease: 'power2.inOut', duration: 1.1, stagger: { each: 0.02, from: 'center' }
       }, 9.2)
-      .to(strands, { rotation: 0, ease: 'elastic.out(1, 0.4)', duration: 0.8 }, 10.3);
+      // each strand settles as its own parting ends (same stagger; the outer ones part until about 10.72).
+      // If the two tweens overlap they both set rotation, and which one wins depends on the scroll direction.
+      .to(strands, { rotation: 0, ease: 'elastic.out(1, 0.4)', duration: 0.8, stagger: { each: 0.02, from: 'center' } }, 10.3);
 
     /* Page 4: the film follows the scroll; the venue arrives on the stage */
     tl.to(filmState, { p: 1, duration: 4.1, onUpdate: function () { media.stage.setProgress(filmState.p); } }, 9.1)
