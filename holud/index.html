@@ -91,7 +91,7 @@
       <!-- Strands of marigold that fall over page 3 and part onto the stage (motion only; js/main.js fills it) -->
       <div class="curtain" aria-hidden="true"></div>
 
-      <!-- Pages 2 and 3: the holud swipe, then the date on a palm -->
+      <!-- Pages 2 and 3: the holud swipe, then the date in a ring of clay lamps -->
       <section class="scene scene--holud" id="invitation" aria-label="Invitation">
         <div class="holud-bg"></div>
         <img class="corner corner--tl" src="assets/img/alpona.webp" alt="" loading="lazy">
@@ -123,8 +123,9 @@
           <p class="tap-hint" aria-hidden="true" data-bind="tapHint">Tap anywhere to add a little holud</p>
         </div>
 
-        <div class="palm-box holud-b">
-          <img class="palm" src="assets/img/mehedi-palm.png" alt="" loading="lazy">
+        <div class="dusk" aria-hidden="true"></div>
+        <div class="prodip-ring holud-b">
+          <div class="lamps" aria-hidden="true"></div>   <!-- js/main.js lays out the clay lamps -->
           <div class="date">
             <p class="date__weekday" data-bind="weekday">Thursday</p>
             <p class="date__day"><span class="sr-only" data-day>24</span><span class="date__digits" aria-hidden="true"></span></p>

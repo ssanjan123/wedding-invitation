@@ -414,6 +414,28 @@
     return strands;
   }
 
+  /* ---------------------------------------------------- ring of clay lamps */
+  // 12 prodip clockwise from 12 o'clock round the date, alternating two painted pots. Every glow comes
+  // before every lamp, so no lamp's light is drawn over its neighbour's pot. The flames flicker out of step.
+  var POTS = [                            // the wick's tip as fractions of each (square) image: measured
+    { src: 'assets/img/prodip-1.webp', wx: 0.5005, wy: 0.0434 },
+    { src: 'assets/img/prodip-2.webp', wx: 0.4910, wy: 0.0501 }
+  ];
+  function buildLamps() {
+    var holder = $('.lamps'), n = 12, seed = 11, glows = '', lamps = '';
+    function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+    for (var i = 0; i < n; i++) {
+      var a = i / n * 2 * Math.PI - Math.PI / 2, pot = POTS[i % 2];
+      var at = 'style="--x:' + (50 + 41 * Math.cos(a)).toFixed(2) + '%;--y:' + (50 + 41 * Math.sin(a)).toFixed(2) + '%;--wx:' + pot.wx + ';--wy:' + pot.wy;
+      glows += '<i class="glow" ' + at + '"></i>';
+      lamps += '<span class="lamp" ' + at + '"><img class="lamp__pot" src="' + pot.src + '" alt="">' +
+        '<span class="lamp__fire"><img class="lamp__flame" src="assets/img/flame.webp" alt="" style="animation-delay:-' +
+        (rnd() * 3).toFixed(2) + 's;animation-duration:' + (1.2 + rnd() * 0.7).toFixed(2) + 's"></span></span>';
+    }
+    holder.innerHTML = glows + lamps;
+    if (!motion) $('.prodip-ring').classList.add('is-lit');
+  }
+
   /* ------------------------------------------------------------ preloader */
   function preload(done) {
     var loader = $('.preloader');
@@ -455,6 +477,7 @@
       { at: 0.36, url: 'assets/audio/thread.mp3', gain: 0.8 },
       { at: 0.8, url: 'assets/audio/doors.mp3' },
       { at: 3.65, url: 'assets/audio/smear.mp3' },
+      { at: 6.55, url: 'assets/audio/light.mp3', gain: 0.7 },
       { at: 8.2, url: 'assets/audio/rustle.mp3', gain: 0.8 },
       { at: 9.2, url: 'assets/audio/cheer.mp3' }
     ],
@@ -486,7 +509,8 @@
     var hosts = $('.hosts'), paste = $('.swipe__paste'), bangla = $('.swipe__bangla'), eventName = $('.swipe__name');
     var of = $('.of'), nOne = $('.names__one'), nTwo = $('.names__two'), amp = $('.names__amp');
     var request = $('.request'), tapHint = $('.tap-hint');
-    var palmBox = $('.palm-box'), palm = $('.palm'), dateFoot = $('.date-foot');
+    var ring = $('.prodip-ring'), dusk = $('.dusk'), dateFoot = $('.date-foot');
+    var lamps = $$('.lamp'), fires = $$('.lamp__fire'), glows = $$('.glow');
     var strands = buildCurtain();
     var film = $('.film'), vTitle = $('.venue-title'), vCard = $('.venue-card');
     var line = $('.evening__line line'), items = $$('.evening__list li');
@@ -507,7 +531,9 @@
           trayFloat.classList.toggle('is-still', t > 0.02);
           media.cloth.setActive(t < 3.3);
           if (t > 0.4) media.stage.load();   // guest has started untying: fetch the stage film now
-          media.dust.setLevel(t < 3.2 ? 0.6 : t < 8.9 ? 0 : 1);
+          ring.classList.toggle('is-lit', t > 6.5 && t < 8.7);   // flames flicker only while they can be seen
+          // none on the paper pages, but embers rise once the lamps are lit
+          media.dust.setLevel(t < 3.2 ? 0.6 : t < 8.9 ? 0.45 * Math.min(1, Math.max(0, (t - 6.6) / 0.9)) : 1);
           if (media.sound) media.sound.setTime(t);
         }
       }
@@ -561,11 +587,15 @@
       .from(tapHint, { autoAlpha: 0, y: 8, ease: 'power2.out', duration: 0.3 }, 5.55)
       .addLabel('invite', 5.8);
 
-    /* Beat B: mehndi lines are drawn up a palm and the date sits in its centre */
+    /* Beat B: dusk falls and the clay lamps round the date are lit one by one, clockwise */
     tl.to([hosts, $('.swipe'), of, $('.names'), request, tapHint, dabs], { autoAlpha: 0, y: -18, ease: 'power2.in', duration: 0.4, stagger: 0.03 }, 6.0)
       .to(garlands, { yPercent: -105, ease: 'power2.in', duration: 0.5, stagger: 0.04 }, 6.0)
-      .from(palmBox, { autoAlpha: 0, y: function () { return innerHeight * 0.1; }, ease: 'power2.out', duration: 0.6 }, 6.2)
-      .fromTo(palm, { '--reveal': 0 }, { '--reveal': 1, ease: 'none', duration: 1.3 }, 6.3)
+      .from(ring, { autoAlpha: 0, y: function () { return innerHeight * 0.06; }, ease: 'power2.out', duration: 0.45 }, 6.25)
+      .from(lamps, { autoAlpha: 0, scale: 0.7, ease: 'back.out(1.6)', duration: 0.35, stagger: 0.02 }, 6.3)
+      .fromTo(dusk, { autoAlpha: 0 }, { autoAlpha: 1, ease: 'power1.inOut', duration: 1.1 }, 6.4)
+      // the last of the 12 is lit by about 7.5
+      .from(fires, { autoAlpha: 0, scale: 0, ease: 'back.out(2.5)', duration: 0.2, stagger: 0.07 }, 6.55)
+      .from(glows, { autoAlpha: 0, scale: 0.4, ease: 'power2.out', duration: 0.4, stagger: 0.07 }, 6.57)
       .from('.date__weekday', { autoAlpha: 0, y: 10, ease: 'power2.out', duration: 0.35 }, 6.75)
       .from('.date__day', { autoAlpha: 0, duration: 0.2 }, 6.8);
     $$('.date__digit > span').forEach(function (col, i) {
@@ -577,7 +607,7 @@
 
     /* Beat C: a curtain of marigold strings falls, then parts onto the holud stage */
     tl.fromTo(strands, { yPercent: -112 }, { yPercent: 0, ease: 'power2.out', duration: 0.7, stagger: { each: 0.025, from: 'random' } }, 8.2)
-      .to([palmBox, dateFoot], { autoAlpha: 0, scale: 0.96, ease: 'power2.in', duration: 0.35 }, 8.35)
+      .to([ring, dateFoot], { autoAlpha: 0, scale: 0.96, ease: 'power2.in', duration: 0.35 }, 8.35)
       .to(corners, { autoAlpha: 0, duration: 0.35 }, 8.4)
       .to(sHolud, { autoAlpha: 0, duration: 0.3 }, 8.85)
       .fromTo(film, { scale: 1.25 }, { scale: 1, ease: 'power2.out', duration: 1.6 }, 8.95)
@@ -666,6 +696,7 @@
   if (debug) window.__sound = sound;   // test hook: __sound.enable(), __sound.debug()
 
   fillContent();
+  buildLamps();
   countdown();
 
   var media = {
