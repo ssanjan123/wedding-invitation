@@ -539,11 +539,13 @@
       }
     });
 
-    // tap for holud: on the swipe page while the stage is pinned, and on the closing page
+    // tap for holud: on the swipe page while the stage is pinned, and on the closing page.
+    // Taps work until 6.4, while the tap hint (gone by 6.55) can still be read: guests on phones
+    // tend to stop a little past the point where it appears.
     Dabs(function (e) {
       if (e.target.closest && e.target.closest('.closing')) return $('.closing__dabs');
       var st = tl.scrollTrigger;
-      return st.isActive && now > 3.7 && now < 5.95 ? dabs : null;
+      return st.isActive && now > 3.7 && now < 6.4 ? dabs : null;
     });
 
     /* Page 1: the thread comes untied, the jamdani doors open, the paper inside fills the screen */
