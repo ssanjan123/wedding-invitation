@@ -1,15 +1,16 @@
 # Wedding invitation
 
 A scroll-animated invitation: a sealed envelope opens, the invitation unfolds inside a palace arch under a
-hand-lettered Bismillah, the date rolls in over a mandala drawn in gold, the arch becomes a doorway into a film of the
-venue, and the page ends on a light ivory page with an illustration of the two of you, a blessing in hand-lettered thuluth
-calligraphy and a note from the couple. Tapping that last page throws a few petals.
+Bismillah written in gold across an illuminated headpiece, the date rolls in over a mandala drawn in gold, the arch
+becomes a doorway into a film of the venue, and the page ends on a light ivory page with an illustration of the two of
+you, Ar-Rum 30:21 ("And He placed between you affection and mercy") lettered in gold in an illuminated cartouche, and a
+note from the couple. Tapping that last page throws a few petals.
 
 ## Change the details
-Edit `js/config.js`: names, initials, date and time, venue, schedule, the Arabic blessing and its
-meaning, and the note from the couple (`message`, one entry per paragraph).
-The blessing is drawn from two hand-lettered images (`blessing.lettered`); if you change the Arabic text, empty that
-list so the new text is shown instead.
+Edit `js/config.js`: names, initials, date and time, venue, schedule, the Arabic verse, its
+meaning and source, and the note from the couple (`message`, one entry per paragraph).
+The verse is drawn from a hand-lettered image (`blessing.lettered`); if you change the Arabic text, empty that list
+so the new text is shown instead (and update `translation` and `source`).
 The weekday, "six o'clock in the evening", the countdown and the calendar file are all worked out from `start`.
 
 Link previews (WhatsApp, iMessage) read the `<meta>` tags at the top of `index.html`, so update the

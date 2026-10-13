@@ -40,13 +40,15 @@ window.INVITE = {
   // e.g. { time: "7:00 pm", item: "Dinner" }
   schedule: [],
 
-  // Last page: a blessing in Arabic calligraphy (\n starts a new line) and its meaning.
+  // Last page: a verse in Arabic calligraphy (\n starts a new line), its meaning and where it is from.
   blessing: {
-    arabic: "بَارَكَ اللَّهُ لَكُمَا وَبَارَكَ عَلَيْكُمَا\nوَجَمَعَ بَيْنَكُمَا فِي خَيْرٍ",
-    translation: "May Allah bless you both, shower His blessings upon you, and unite you in goodness.",
-    // The same blessing hand-lettered in thuluth, one image per line. If you change `arabic`, empty this list
-    // so the new text is shown instead.
-    lettered: ["assets/img/dua-1.webp", "assets/img/dua-2.webp"]
+    arabic: "وَجَعَلَ بَيْنَكُم مَّوَدَّةً وَرَحْمَةً",
+    translation: "And He placed between you affection and mercy.",
+    source: "Surah Ar-Rum, 30:21",
+    // The same verse hand-lettered, written in over an illuminated panel: one image per line, all the same size.
+    // If you change `arabic`, empty `lettered` so the new text is shown instead.
+    lettered: ["assets/img/ayah.webp"],
+    panel: "assets/img/ayah-panel.webp"
   },
 
   // A note from the couple. Each item is one paragraph.

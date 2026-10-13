@@ -385,20 +385,23 @@ html:not(.motion) .scene--invite { padding: 6svh 0 4svh; }
   text-align: center;
 }
 .invite-a { display: flex; flex-direction: column; align-items: center; gap: 2cqw; }
-/* The Bismillah, hand-lettered in thuluth (from the nikah nama). The letters are a mask on an inner layer, so the
-   ink colour is CSS; the outer mask follows --reveal, writing it in from right to left. Two nested masks, not one
-   mask-composite: Chrome drew a hairline round the box where the two mask layers met its fractional edges. */
-.bismillah {
-  position: relative; width: 44cqw; aspect-ratio: 1112 / 405; margin-bottom: 1cqw;
+/* The Bismillah, as in the headpiece of a Mughal Quran: the letters (basmala.webp) are written in, in gold, over the
+   empty emerald field of an illuminated headpiece (basmala-panel.webp). The ink box is where the letters fit that
+   field, measured from both images: re-measure if either changes. The letters are a mask on the ink's ::before, so
+   their colour is CSS; the ink's own mask follows --reveal, writing them in from right to left. Two nested masks,
+   not one mask-composite: Chrome drew a hairline round the box where two mask layers met its fractional edges. */
+.bismillah { position: relative; width: 62cqw; aspect-ratio: 1100 / 459; margin-bottom: 1cqw; }
+.bismillah__panel { position: absolute; inset: 0; width: 100%; height: 100%; }
+.bismillah__ink {
+  position: absolute; left: 24.41%; top: 60.13%; width: 51.18%; height: 33.34%;
   -webkit-mask-image: linear-gradient(270deg, #000 calc(var(--reveal) * 130% - 30%), transparent calc(var(--reveal) * 130%));
   mask-image: linear-gradient(270deg, #000 calc(var(--reveal) * 130% - 30%), transparent calc(var(--reveal) * 130%));
 }
-.bismillah::before {
-  content: ""; position: absolute; inset: 0; background: var(--ink);
-  -webkit-mask: url("../assets/img/bismillah.webp") center / 100% 100% no-repeat;
-  mask: url("../assets/img/bismillah.webp") center / 100% 100% no-repeat;
+.bismillah__ink::before {
+  content: ""; position: absolute; inset: 0; background: var(--foil);
+  -webkit-mask: url("../assets/img/basmala.webp") center / 100% 100% no-repeat;
+  mask: url("../assets/img/basmala.webp") center / 100% 100% no-repeat;
 }
-@container (max-width: 520px) { .bismillah { width: 52cqw; } }
 .monogram small, .seal__initials small { font-size: .62em; margin: 0 .04em; }
 /* once js/main.js has measured them, each letter is placed individually around the medallion centre */
 .monogram.is-fitted, .seal__initials.is-fitted { position: relative; width: 0; height: 0; padding: 0; translate: none; background: none; }
@@ -612,27 +615,25 @@ html:not(.motion) .scene--venue { min-height: 100svh; }
   -webkit-mask-image: linear-gradient(270deg, #000 calc(var(--reveal) * 130% - 30%), transparent calc(var(--reveal) * 130%));
   mask-image: linear-gradient(270deg, #000 calc(var(--reveal) * 130% - 30%), transparent calc(var(--reveal) * 130%));
 }
-/* the same blessing hand-lettered in thuluth (js/config.js blessing.lettered): each line image masks the gold of an
-   inner <i>, and the line's own mask writes it in (nested like .bismillah). Both lines are drawn at one scale
-   (--w: the line's width in image pixels, --wmax: the widest line's). */
-.calligraphy.is-lettered { width: 100%; padding: 26px 0 10px; }
-.calligraphy__lines {
-  width: min(100%, 560px); margin: 0 auto;
-  display: flex; flex-direction: column; align-items: center;
-  filter: drop-shadow(0 1px 0 rgba(255, 248, 230, .9));
-}
+/* the verse hand-lettered (js/config.js blessing.lettered), written in, in gold, over the maroon field of an
+   illuminated cartouche (blessing.panel). Every line image is the size of the whole lettering and they are stacked,
+   each masking the gold of an inner <i>, with the line's own mask writing it in (nested like .bismillah). The lines
+   box is where the lettering fits the cartouche's field, measured from ayah-panel.webp and ayah.webp. */
+.calligraphy.is-lettered { width: 100%; padding: 20px 0 8px; }
+.calligraphy__art { position: relative; width: min(100%, 620px); aspect-ratio: 1100 / 463; margin: 0 auto; }
+.calligraphy__panel { position: absolute; inset: 0; width: 100%; height: 100%; }
+.calligraphy__lines { position: absolute; left: 22.36%; top: 40.17%; width: 55.27%; height: 33.31%; }
 .calligraphy__line {
-  position: relative; display: block; width: calc(var(--w, 0) / var(--wmax, 1) * 100%);
+  position: absolute; inset: 0;
   -webkit-mask-image: linear-gradient(270deg, #000 calc(var(--reveal) * 130% - 30%), transparent calc(var(--reveal) * 130%));
   mask-image: linear-gradient(270deg, #000 calc(var(--reveal) * 130% - 30%), transparent calc(var(--reveal) * 130%));
 }
 .calligraphy__line > i {
-  position: absolute; inset: 0;
-  background: linear-gradient(100deg, #5E420F 0%, #8E6A22 30%, #C9A24B 48%, #8E6A22 64%, #4F370C 100%);
+  position: absolute; inset: 0; background: var(--foil);
   -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
   -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
 }
-.calligraphy__line + .calligraphy__line { margin-top: -3%; }
+.blessing__source { margin-top: 4px; font-size: 14px; letter-spacing: .14em; text-transform: uppercase; color: var(--gold-600); }
 .blessing__translation {
   max-width: 30rem; margin-top: 6px;
   font-style: italic; font-size: clamp(18px, 2.2vw, 21px); line-height: 1.5;

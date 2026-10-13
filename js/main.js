@@ -111,43 +111,40 @@
     calendarLinks();
   }
 
-  /* The blessing hand-lettered in thuluth (blessing.lettered): each line image is a mask over the gold, and the line
-     is written in right to left like the typeset text. The text stays in the heading for screen readers, and comes
-     back into view if an image fails to load. Resolves with the lines once their sizes are known. */
+  /* The verse hand-lettered (blessing.lettered) over an illuminated cartouche (blessing.panel): each line image is a
+     mask over the gold, written in right to left like the typeset text. The text stays in the heading for screen
+     readers, and comes back into view if an image fails to load. Resolves with the panel and the lines once loaded. */
   function letterBlessing() {
     var srcs = (C.blessing && C.blessing.lettered) || [];
-    if (!srcs.length) return Promise.resolve([]);
-    var box = $('.calligraphy'), text = $('.calligraphy__text'), holder = document.createElement('div');
+    if (!srcs.length || !C.blessing.panel) return Promise.resolve(null);
+    var box = $('.calligraphy'), text = $('.calligraphy__text'), art = document.createElement('div');
+    var panel = new Image(), holder = document.createElement('div');
+    art.className = 'calligraphy__art';
+    art.setAttribute('aria-hidden', 'true');
+    panel.className = 'calligraphy__panel';
+    panel.alt = '';
     holder.className = 'calligraphy__lines';
-    holder.setAttribute('aria-hidden', 'true');
+    art.appendChild(panel);
+    art.appendChild(holder);
     box.classList.add('is-lettered');
     text.classList.add('sr-only');
-    box.appendChild(holder);
-    return Promise.all(srcs.map(function (src) {
+    box.appendChild(art);
+    var loaded = function (im, src) { return new Promise(function (ok, fail) { im.onload = ok; im.onerror = fail; im.src = src; }); };
+    var lines = srcs.map(function (src) {
       var line = document.createElement('span'), ink = document.createElement('i');
       line.className = 'calligraphy__line';
       ink.style.webkitMaskImage = ink.style.maskImage = 'url("' + src + '")';
       line.appendChild(ink);
       holder.appendChild(line);
-      return new Promise(function (ok, fail) {
-        var im = new Image();
-        im.onload = function () {
-          line.style.setProperty('--w', im.naturalWidth);
-          line.style.aspectRatio = im.naturalWidth + ' / ' + im.naturalHeight;
-          ok(line);
-        };
-        im.onerror = fail;
-        im.src = src;
-      });
-    })).then(function (lines) {
-      holder.style.setProperty('--wmax', Math.max.apply(null, lines.map(function (l) { return +l.style.getPropertyValue('--w'); })));
-      return lines;
-    }, function () {
-      holder.remove();
-      box.classList.remove('is-lettered');
-      text.classList.remove('sr-only');
-      return [];
+      return line;
     });
+    return Promise.all([loaded(panel, C.blessing.panel)].concat(srcs.map(function (src) { return loaded(new Image(), src); })))
+      .then(function () { return { panel: panel, lines: lines }; }, function () {
+        art.remove();
+        box.classList.remove('is-lettered');
+        text.classList.remove('sr-only');
+        return null;
+      });
   }
 
   // Full names can be long: shrink both script lines together until the longer one fits the arch
@@ -451,7 +448,7 @@
   function preload(done) {
     var loader = $('.preloader');
     var urls = ['assets/img/seal.webp', 'assets/img/liner.webp', 'assets/img/card-paper.webp',
-      'assets/img/crest.webp', 'assets/img/arch.webp', 'assets/img/bismillah.webp', portrait.matches ? 'assets/img/velvet-port.jpg' : 'assets/img/velvet-land.jpg'];
+      'assets/img/crest.webp', 'assets/img/arch.webp', 'assets/img/basmala-panel.webp', 'assets/img/basmala.webp', portrait.matches ? 'assets/img/velvet-port.jpg' : 'assets/img/velvet-land.jpg'];
     var total = urls.length + 1, n = 0, finished = false;
     function finish() {
       if (finished) return;
@@ -518,7 +515,7 @@
     var cue = $('.scroll-cue'), skip = $('.skip'), burst = $('.burst');
     var sEnv = $('.scene--envelope'), sInv = $('.scene--invite');
     var invBg = $('.invite-bg'), frame = $('.portal__frame'), arch = $('.arch'), spray = $('.spray');
-    var bismillah = $('.bismillah'), hosts = $('.hosts'), namesEl = $('.names'), request = $('.request');
+    var bismillah = $('.bismillah'), basmalaPanel = $('.bismillah__panel'), basmalaInk = $('.bismillah__ink'), hosts = $('.hosts'), namesEl = $('.names'), request = $('.request');
     var nOne = $('.names__one'), nTwo = $('.names__two'), amp = $('.names__amp');
     var invB = $('.invite-b'), namesSmall = $('.names-small'), mandala = $('.mandala');
     var florals = $$('.floral'), garlands = $$('.garland');
@@ -590,7 +587,8 @@
       .from(garlands, { yPercent: -105, ease: 'power2.out', duration: 0.7, stagger: 0.08 }, 3.55)
       .to(garlands, { rotation: 0, ease: 'elastic.out(1, 0.35)', duration: 0.9, stagger: 0.08 }, 3.95)
       .from(spray, { y: 40, autoAlpha: 0, scale: 0.92, ease: 'power2.out', duration: 0.6 }, 3.7)
-      .fromTo(bismillah, { '--reveal': 0 }, { '--reveal': 1, ease: 'power1.inOut', duration: 0.5 }, 3.7)
+      .from(basmalaPanel, { autoAlpha: 0, scale: 0.9, ease: 'power2.out', duration: 0.4 }, 3.6)
+      .fromTo(basmalaInk, { '--reveal': 0 }, { '--reveal': 1, ease: 'power1.inOut', duration: 0.5 }, 3.8)
       .from(hosts, { autoAlpha: 0, y: 14, ease: 'power2.out', duration: 0.4 }, 3.95)
       .fromTo(nOne, { '--reveal': 0 }, { '--reveal': 1, ease: 'power1.inOut', duration: 0.55 }, 4.1)
       .from(amp, { autoAlpha: 0, scale: 0.5, rotation: -12, ease: 'back.out(2)', duration: 0.35 }, 4.5)
@@ -648,14 +646,12 @@
       scrollTrigger: { trigger: '.portrait', start: 'top 98%', end: 'top 55%', scrub: debug ? true : 0.6 }
     });
 
-    /* Then the blessing is written in, right to left: line by line when it is hand-lettered,
-       each line taking as long as it is wide, so the pen keeps one speed */
-    lettering.then(function (lines) {
+    /* Then the verse: the cartouche opens out, and the lettering is written in, right to left, line by line */
+    lettering.then(function (art) {
       var write = gsap.timeline({ scrollTrigger: { trigger: '.calligraphy', start: 'top 88%', end: 'top 38%', scrub: debug ? true : 0.6 } });
-      if (!lines.length) write.fromTo('.calligraphy__text', { '--reveal': 0 }, { '--reveal': 1, ease: 'none' });
-      lines.forEach(function (line) {
-        write.fromTo(line, { '--reveal': 0 }, { '--reveal': 1, ease: 'none', duration: line.style.getPropertyValue('--w') / 1000 });
-      });
+      if (!art) { write.fromTo('.calligraphy__text', { '--reveal': 0 }, { '--reveal': 1, ease: 'none' }); return; }
+      write.from(art.panel, { autoAlpha: 0, scale: 0.9, ease: 'power2.out', duration: 0.4 });
+      art.lines.forEach(function (line) { write.fromTo(line, { '--reveal': 0 }, { '--reveal': 1, ease: 'none', duration: 1 }); });
     });
     gsap.fromTo('.calligraphy__halo', { rotation: -35 }, {
       rotation: 35, ease: 'none',
