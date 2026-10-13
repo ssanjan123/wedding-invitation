@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Send the invitations</title>
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=Imperial+Script&display=swap">
+  <!--
+    Personal links for the guest list: not linked from either invitation, and not indexed.
+    Paste "Name, phone" lines; each guest gets a ?to= link and a WhatsApp button with the message filled in.
+    The list, the messages and the "sent" ticks stay in this browser (localStorage); nothing is uploaded.
+  -->
+  <style>
+    :root {
+      --ivory: #F7EEDB; --paper: #FFFBF2; --ink: #2A1A12; --muted: #6F5A49; --line: #E2D3B5;
+      --emerald: #0F4D3A; --emerald-dark: #082A1F; --gold: #A07A2C; --maroon: #6B1424; --ok: #1F7A4D;
+      --serif: "Cormorant Garamond", Georgia, serif;
+      --ui: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+    body { margin: 0; background: var(--ivory); color: var(--ink); font: 16px/1.5 var(--ui); }
+    main { max-width: 760px; margin: 0 auto; padding: 28px 16px 64px; }
+    h1 { margin: 0; font: 400 46px/1.1 "Imperial Script", var(--serif); color: var(--maroon); }
+    .lead { margin: 6px 0 0; color: var(--muted); }
+    h2 { margin: 0 0 8px; font: 600 22px/1.2 var(--serif); color: var(--emerald-dark); }
+    section { margin-top: 26px; }
+    .hint { margin: 0 0 8px; font-size: 14px; color: var(--muted); }
+    textarea, input[type=text] {
+      width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px;
+      background: var(--paper); color: var(--ink); font: 15px/1.45 var(--ui);
+    }
+    textarea:focus, input:focus, button:focus-visible, a:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+    #guests { min-height: 170px; }
+    #message { min-height: 130px; }
+
+    .events { display: flex; gap: 8px; flex-wrap: wrap; }
+    .events label {
+      display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 999px;
+      border: 1px solid var(--line); background: var(--paper); cursor: pointer; font-weight: 500;
+    }
+    .events input { accent-color: var(--emerald); margin: 0; }
+    .events label:has(input:checked) { border-color: var(--emerald); background: #E4EFE9; }
+
+    .bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 14px; margin-bottom: 10px; }
+    .count { color: var(--muted); font-size: 14px; }
+    button, .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      min-height: 38px; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--line);
+      background: var(--paper); color: var(--ink); font: 500 14px/1.2 var(--ui); text-decoration: none; cursor: pointer;
+    }
+    button:hover, .btn:hover { border-color: var(--gold); }
+    .btn--wa { background: var(--emerald); border-color: var(--emerald); color: #fff; }
+    .btn--wa:hover { background: var(--emerald-dark); }
+    .linkish { border: 0; background: none; padding: 0; min-height: 0; color: var(--maroon); text-decoration: underline; text-underline-offset: 3px; }
+
+    .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+    .guest {
+      display: grid; grid-template-columns: auto 1fr auto; gap: 4px 12px; align-items: center;
+      padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper);
+    }
+    .guest.is-sent { background: #EEF5F0; border-color: #CFE3D7; }
+    .guest input[type=checkbox] { width: 20px; height: 20px; margin: 0; accent-color: var(--ok); }
+    .guest__who { min-width: 0; }
+    .guest__name { font-weight: 600; }
+    .guest__phone { color: var(--muted); font-size: 14px; }
+    .guest__phone.is-missing { font-style: italic; }
+    .guest__link { grid-column: 2 / -1; font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+    .guest__link a { color: inherit; }
+    .guest__actions { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+    .empty { padding: 18px; border: 1px dashed var(--line); border-radius: 12px; color: var(--muted); text-align: center; }
+    .toast {
+      position: fixed; left: 50%; bottom: 20px; translate: -50% 0; padding: 9px 16px; border-radius: 999px;
+      background: var(--emerald-dark); color: #fff; font-size: 14px; opacity: 0; transition: opacity .2s; pointer-events: none;
+    }
+    .toast.is-on { opacity: 1; }
+    @media (max-width: 520px) {
+      h1 { font-size: 40px; }
+      .guest { grid-template-columns: auto 1fr; }
+      .guest__actions { grid-column: 1 / -1; justify-content: flex-start; }
+      .guest__link { grid-column: 1 / -1; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Send the invitations</h1>
+  <p class="lead">One personal link per guest, with their name on the envelope, and a WhatsApp message ready to send.
+    Your list stays in this browser; nothing is uploaded.</p>
+
+  <section>
+    <h2>Which invitation</h2>
+    <div class="events" role="radiogroup">
+      <label><input type="radio" name="event" value="wedding" checked> Wedding</label>
+      <label><input type="radio" name="event" value="holud"> Gaye Holud</label>
+    </div>
+  </section>
+
+  <section>
+    <h2>Guests</h2>
+    <p class="hint">One guest per line: the name as it should appear on the envelope, then a comma and their WhatsApp number
+      (optional). Bangladeshi numbers can be written as 017… or +880 17…; others need their country code.
+      Rows pasted from a spreadsheet work too.</p>
+    <textarea id="guests" spellcheck="false" placeholder="Sarah &amp; Tom, 01712 345678&#10;The Rahman family, +880 1812-345678&#10;Uncle Jamal"></textarea>
+  </section>
+
+  <section>
+    <h2>Message</h2>
+    <p class="hint"><b>{name}</b> becomes the guest's name and <b>{link}</b> their personal link.
+      <button class="linkish" type="button" id="reset">Use the suggested message</button></p>
+    <textarea id="message"></textarea>
+  </section>
+
+  <section>
+    <div class="bar">
+      <h2 style="margin:0">Links</h2>
+      <span class="count" id="count"></span>
+      <button type="button" id="copy-all">Copy all links</button>
+    </div>
+    <ol class="list" id="list"></ol>
+  </section>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var EVENTS = {
+    wedding: {
+      url: new URL('../', location.href).href,
+      message: 'Assalamu alaikum {name},\n\nWe would be honoured to have you at our wedding. Your invitation is here:\n{link}\n\nWith love,\nWahid & Anushka'
+    },
+    holud: {
+      url: new URL('../holud/', location.href).href,
+      message: 'Assalamu alaikum {name},\n\nCome and celebrate our Gaye Holud with us! Your invitation is here:\n{link}\n\nWith love,\nWahid & Anushka'
+    }
+  };
+  var KEY = 'invite-send:v1';
+  var $ = function (s) { return document.querySelector(s); };
+  var guestsEl = $('#guests'), messageEl = $('#message'), listEl = $('#list'), countEl = $('#count');
+
+  // what this browser remembers: per invitation, the guest list, the message and who has been sent theirs
+  var state = load();
+  function load() {
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+    s = s && typeof s === 'object' ? s : {};
+    s.event = EVENTS[s.event] ? s.event : 'wedding';
+    s.guests = s.guests || {};
+    s.messages = s.messages || {};
+    s.sent = s.sent || {};
+    Object.keys(EVENTS).forEach(function (k) { s.sent[k] = s.sent[k] || {}; });
+    return s;
+  }
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+  }
+
+  // "Name, phone" (or a tab from a spreadsheet). The last comma or tab splits off the phone, if what follows it
+  // has enough digits to be one; otherwise the whole line is the name.
+  function parse(text) {
+    return text.split(/\r?\n/).map(function (line) {
+      line = line.trim();
+      if (!line) return null;
+      var cut = Math.max(line.lastIndexOf(','), line.lastIndexOf('\t')), name = line, phone = '';
+      if (cut > 0 && line.slice(cut + 1).replace(/\D/g, '').length >= 7) {
+        name = line.slice(0, cut).trim();
+        phone = line.slice(cut + 1).trim();
+      }
+      return { name: name.replace(/[,\t]+$/, '').trim(), phone: phone };
+    }).filter(function (g) { return g && g.name; });
+  }
+
+  // digits for wa.me: Bangladeshi mobiles get 88 in front (01712345678 -> 8801712345678)
+  function waNumber(phone) {
+    var d = phone.replace(/\D/g, '');
+    if (!d) return '';
+    if (d.indexOf('00') === 0) d = d.slice(2);
+    if (d.length === 11 && d.charAt(0) === '0') d = '88' + d;
+    else if (d.length === 10 && d.charAt(0) === '1') d = '880' + d;
+    return d;
+  }
+
+  function linkFor(name) { return EVENTS[state.event].url + '?to=' + encodeURIComponent(name); }
+  function sentKey(g) { return g.name.toLowerCase() + '|' + waNumber(g.phone); }
+  function message() { return state.messages[state.event] != null ? state.messages[state.event] : EVENTS[state.event].message; }
+
+  function render() {
+    var guests = parse(guestsEl.value), sent = state.sent[state.event], done = 0;
+    listEl.innerHTML = '';
+    if (!guests.length) {
+      listEl.innerHTML = '<li class="empty">Add guests above and their links appear here.</li>';
+    }
+    guests.forEach(function (g) {
+      var link = linkFor(g.name), num = waNumber(g.phone), key = sentKey(g), isSent = !!sent[key];
+      var text = message().split('{name}').join(g.name).split('{link}').join(link);
+      if (isSent) done++;
+      var li = document.createElement('li');
+      li.className = 'guest' + (isSent ? ' is-sent' : '');
+
+      var tick = document.createElement('input');
+      tick.type = 'checkbox';
+      tick.checked = isSent;
+      tick.title = 'Sent';
+      tick.setAttribute('aria-label', 'Sent to ' + g.name);
+      tick.addEventListener('change', function () { mark(key, tick.checked); });
+
+      var who = document.createElement('div');
+      who.className = 'guest__who';
+      who.innerHTML = '<div class="guest__name"></div><div class="guest__phone"></div>';
+      who.firstChild.textContent = g.name;
+      who.lastChild.textContent = num ? '+' + num : 'No number: WhatsApp will ask who to send it to';
+      if (!num) who.lastChild.classList.add('is-missing');
+
+      var actions = document.createElement('div');
+      actions.className = 'guest__actions';
+      var copy = document.createElement('button');
+      copy.type = 'button';
+      copy.textContent = 'Copy link';
+      copy.addEventListener('click', function () { clip(link, 'Link copied'); });
+      var wa = document.createElement('a');
+      wa.className = 'btn btn--wa';
+      wa.href = 'https://wa.me/' + num + '?text=' + encodeURIComponent(text);
+      wa.target = '_blank';
+      wa.rel = 'noopener';
+      wa.textContent = 'Send on WhatsApp';
+      wa.addEventListener('click', function () { if (!sent[key]) mark(key, true); });
+      actions.appendChild(copy);
+      actions.appendChild(wa);
+
+      var url = document.createElement('div');
+      url.className = 'guest__link';
+      url.innerHTML = '<a target="_blank" rel="noopener"></a>';
+      url.firstChild.href = link;
+      url.firstChild.textContent = link;
+
+      li.appendChild(tick);
+      li.appendChild(who);
+      li.appendChild(actions);
+      li.appendChild(url);
+      listEl.appendChild(li);
+    });
+    countEl.textContent = guests.length ? done + ' of ' + guests.length + ' sent' : '';
+  }
+
+  function mark(key, on) {
+    if (on) state.sent[state.event][key] = true;
+    else delete state.sent[state.event][key];
+    save();
+    render();
+  }
+
+  function clip(text, note) {
+    function done() { toast(note); }
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(done, fallback);
+    } else fallback();
+    function fallback() {
+      var t = document.createElement('textarea');
+      t.value = text;
+      t.style.position = 'fixed';
+      t.style.opacity = '0';
+      document.body.appendChild(t);
+      t.select();
+      try { document.execCommand('copy'); done(); } catch (e) { toast('Could not copy'); }
+      t.remove();
+    }
+  }
+  var toastTimer;
+  function toast(text) {
+    var el = $('#toast');
+    el.textContent = text;
+    el.classList.add('is-on');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.classList.remove('is-on'); }, 1600);
+  }
+
+  function showEvent() {
+    document.querySelector('input[name=event][value=' + state.event + ']').checked = true;
+    guestsEl.value = state.guests[state.event] || '';
+    messageEl.value = message();
+    render();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('input[name=event]'), function (r) {
+    r.addEventListener('change', function () { state.event = r.value; save(); showEvent(); });
+  });
+  guestsEl.addEventListener('input', function () { state.guests[state.event] = guestsEl.value; save(); render(); });
+  messageEl.addEventListener('input', function () { state.messages[state.event] = messageEl.value; save(); render(); });
+  $('#reset').addEventListener('click', function () { delete state.messages[state.event]; save(); showEvent(); });
+  $('#copy-all').addEventListener('click', function () {
+    var guests = parse(guestsEl.value);
+    if (!guests.length) return toast('No guests yet');
+    // name and link separated by a tab, so it pastes into two spreadsheet columns
+    clip(guests.map(function (g) { return g.name + '\t' + linkFor(g.name); }).join('\n'), guests.length + ' links copied');
+  });
+
+  showEvent();
+})();
+</script>
+</body>
+</html>
