@@ -56,7 +56,7 @@ window.INVITE = {
 
   // A note from the couple. Each item is one paragraph.
   message: [
-    "Before the vows and the formal photographs, there is holud: turmeric on our cheeks, sweets we did not ask for, and every aunt, cousin and friend singing a little too loudly.",
+    "Before the wedding and the formal photographs, there is holud: turmeric on our cheeks, sweets we did not ask for, and every aunt, cousin and friend singing a little too loudly.",
     "It would not be the same without you. Come hungry, come in yellow, and come ready to dance."
   ],
   signoff: "With love and a little turmeric,",
