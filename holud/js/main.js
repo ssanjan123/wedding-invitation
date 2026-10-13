@@ -491,7 +491,9 @@
     gsap.registerPlugin(ScrollTrigger);
     ScrollTrigger.config({ ignoreMobileResize: true });
 
-    var lenis = new Lenis({ lerp: 0.085, wheelMultiplier: 0.9 });
+    // on phones a flick glides to the next resting moment (STOPS below) instead of coasting through the story
+    var pace = window.InvitePace && InvitePace.supported ? InvitePace.create() : null;
+    var lenis = new Lenis({ lerp: 0.085, wheelMultiplier: 0.9, syncTouch: !!pace, virtualScroll: pace ? pace.onScroll : undefined });
     lenis.on('scroll', ScrollTrigger.update);
     gsap.ticker.add(function (time) { lenis.raf(time * 1000); });
     gsap.ticker.lagSmoothing(0);
@@ -499,6 +501,8 @@
 
     var TOTAL = 14.4;    // timeline length in units
     var UNIT = 0.5;      // viewport heights of scrolling per unit
+    // resting moments: a flick on a phone glides at most to the next one, in either direction
+    var STOPS = [0, 1.75, 5.8, 7.9, 10.5, 12.1, TOTAL];
 
     var trayFloat = $('.tray-float'), tray = $('.tray'), kula = $('.kula'), bati = $('.bati');
     var card = $('.card'), inside = $('.card__inside'), doorL = $('.door--l'), doorR = $('.door--r');
@@ -652,6 +656,11 @@
       scrollTrigger: { trigger: '.swatches', start: 'top 92%', end: 'top 62%', scrub: debug ? true : 0.6 }
     });
 
+    if (pace) pace.attach(lenis, function () {
+      var st = tl.scrollTrigger;
+      return STOPS.map(function (t) { return st.start + (st.end - st.start) * t / TOTAL; });
+    });
+
     // scroll progress line
     var bar = $('.progress span');
     ScrollTrigger.create({ start: 0, end: 'max', onUpdate: function (s) { bar.style.setProperty('--p', s.progress.toFixed(4)); } });
@@ -661,6 +670,7 @@
     });
 
     if (debug) {
+      window.__pace = pace;   // test hook: __pace.last is the latest flick's glide
       // test hook: jump to a moment of the timeline (units) or to a page fraction
       window.__seek = function (t) {
         var st = tl.scrollTrigger;
