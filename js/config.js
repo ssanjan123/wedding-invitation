@@ -23,7 +23,7 @@ window.INVITE = {
   hosts: "Together with their families",
   request: "request the honour of your presence at their wedding",
 
-  // Local time at the venue, 24-hour clock. The start time is still a placeholder.
+  // Local time at the venue, 24-hour clock
   start: "2026-12-27T18:00",
   end: "2026-12-27T23:00",
   // Bangladesh time, so the countdown and calendar are right for guests anywhere
@@ -43,7 +43,10 @@ window.INVITE = {
   // Last page: a blessing in Arabic calligraphy (\n starts a new line) and its meaning.
   blessing: {
     arabic: "بَارَكَ اللَّهُ لَكُمَا وَبَارَكَ عَلَيْكُمَا\nوَجَمَعَ بَيْنَكُمَا فِي خَيْرٍ",
-    translation: "May Allah bless you both, shower His blessings upon you, and unite you in goodness."
+    translation: "May Allah bless you both, shower His blessings upon you, and unite you in goodness.",
+    // The same blessing hand-lettered in thuluth, one image per line. If you change `arabic`, empty this list
+    // so the new text is shown instead.
+    lettered: ["assets/img/dua-1.webp", "assets/img/dua-2.webp"]
   },
 
   // A note from the couple. Each item is one paragraph.
@@ -53,6 +56,8 @@ window.INVITE = {
   ],
   signoff: "With love,",
   families: "and their families",
+  // Only on personal links (?to=): {name} is the guest's name.
+  guestLine: "We hope to see you there, {name}.",
 
   // Music, ambience and sound effects (the files are in assets/audio, the timings in js/main.js).
   // Guests choose "Open with sound" or "Open without sound" when the page has loaded. false turns all sound off.

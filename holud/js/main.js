@@ -88,6 +88,11 @@
 
     var to = (params.get('to') || '').trim();
     $('[data-guest]').textContent = to ? (/^for\s/i.test(to) ? to : 'For ' + to) : C.guestDefault;
+    var guestLine = $('[data-guest-line]'), guest = to.replace(/^for\s+/i, '');
+    if (guest && C.guestLine) {
+      guestLine.textContent = C.guestLine.replace('{name}', guest);
+      guestLine.hidden = false;
+    }
 
     document.title = names + '’s ' + C.event.name;
     $('[data-day]').textContent = String(start.getUTCDate());
@@ -348,6 +353,14 @@
     }).observe(section);
   }
 
+  /* ------------------------------------------------------------- haptics */
+  // A short tick on phones that can vibrate (Android). Only once the guest has tapped the page: Chrome refuses
+  // vibrate() before that and logs a warning.
+  var canBuzz = !!navigator.vibrate && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function buzz(ms) {
+    if (canBuzz && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) navigator.vibrate(ms);
+  }
+
   /* -------------------------------------- tap anywhere: a dab of holud */
   // host(e) returns the element to leave the mark in, or null where taps should do nothing
   function Dabs(host) {
@@ -373,6 +386,7 @@
       gsap.fromTo(dab, { xPercent: -50, yPercent: -50, scale: 0.35, rotation: Math.random() * 360, autoAlpha: 0 }, { scale: 1, autoAlpha: 0.95, duration: 0.35, ease: 'back.out(2.2)' });
       marks.push(dab);
       if (sound) sound.play('dab');
+      buzz(10);
       if (marks.length > 30) marks.shift().remove();
       for (var i = 0; i < 5; i++) {
         var p = document.createElement('img');
@@ -519,7 +533,7 @@
     var film = $('.film'), vTitle = $('.venue-title'), vCard = $('.venue-card');
     var line = $('.evening__line line'), items = $$('.evening__list li');
 
-    var filmState = { p: 0 }, now = 0;
+    var filmState = { p: 0 }, now = 0, lastT = 0;
     var tl = gsap.timeline({
       defaults: { ease: 'none' },
       scrollTrigger: {
@@ -532,6 +546,8 @@
         invalidateOnRefresh: true,
         onUpdate: function (self) {
           var t = now = self.progress * TOTAL;
+          if (t >= 0.36 && lastT < 0.36) buzz(14);   // the thread comes untied (going forward only, like the sound cues)
+          lastT = t;
           trayFloat.classList.toggle('is-still', t > 0.02);
           media.cloth.setActive(t < 3.3);
           if (t > 0.4) media.stage.load();   // guest has started untying: fetch the stage film now

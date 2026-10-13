@@ -690,6 +690,9 @@ html:not(.motion) .scene--stage { min-height: 100svh; }
 .message { max-width: 33rem; font-size: clamp(18px, 2vw, 20px); line-height: 1.75; color: var(--ink); text-wrap: pretty; }
 .message p + p { margin-top: 14px; }
 
+.guest-line { margin-top: 26px; font-style: italic; font-size: clamp(19px, 2.1vw, 21px); color: var(--henna); text-wrap: balance; }
+.guest-line[hidden] { display: none; }
+.guest-line + .signoff { margin-top: 18px; }
 .signoff { margin-top: 30px; font-style: italic; font-size: 19px; color: var(--henna); }
 .signoff__names { word-spacing: .1em; font-family: var(--script); font-size: clamp(44px, 6vw, 58px); line-height: 1.25; padding: 0 .3em; }
 .signoff__families { font-style: italic; font-size: 18px; color: var(--henna); }

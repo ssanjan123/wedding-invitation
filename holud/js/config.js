@@ -61,6 +61,8 @@ window.INVITE = {
   ],
   signoff: "With love and a little turmeric,",
   families: "and their families",
+  // Only on personal links (?to=): {name} is the guest's name.
+  guestLine: "Save a dance for us, {name}.",
 
   // The link at the very end. Leave `url` empty to hide it.
   wedding: {

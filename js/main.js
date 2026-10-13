@@ -87,6 +87,11 @@
 
     var to = (params.get('to') || '').trim();
     $('[data-guest]').textContent = to ? (/^for\s/i.test(to) ? to : 'For ' + to) : C.guestDefault;
+    var guestLine = $('[data-guest-line]'), guest = to.replace(/^for\s+/i, '');
+    if (guest && C.guestLine) {
+      guestLine.textContent = C.guestLine.replace('{name}', guest);
+      guestLine.hidden = false;
+    }
 
     document.title = names + ' are getting married';
     $('[data-day]').textContent = String(start.getUTCDate());
@@ -104,6 +109,45 @@
     }
 
     calendarLinks();
+  }
+
+  /* The blessing hand-lettered in thuluth (blessing.lettered): each line image is a mask over the gold, and the line
+     is written in right to left like the typeset text. The text stays in the heading for screen readers, and comes
+     back into view if an image fails to load. Resolves with the lines once their sizes are known. */
+  function letterBlessing() {
+    var srcs = (C.blessing && C.blessing.lettered) || [];
+    if (!srcs.length) return Promise.resolve([]);
+    var box = $('.calligraphy'), text = $('.calligraphy__text'), holder = document.createElement('div');
+    holder.className = 'calligraphy__lines';
+    holder.setAttribute('aria-hidden', 'true');
+    box.classList.add('is-lettered');
+    text.classList.add('sr-only');
+    box.appendChild(holder);
+    return Promise.all(srcs.map(function (src) {
+      var line = document.createElement('span'), ink = document.createElement('i');
+      line.className = 'calligraphy__line';
+      ink.style.webkitMaskImage = ink.style.maskImage = 'url("' + src + '")';
+      line.appendChild(ink);
+      holder.appendChild(line);
+      return new Promise(function (ok, fail) {
+        var im = new Image();
+        im.onload = function () {
+          line.style.setProperty('--w', im.naturalWidth);
+          line.style.aspectRatio = im.naturalWidth + ' / ' + im.naturalHeight;
+          ok(line);
+        };
+        im.onerror = fail;
+        im.src = src;
+      });
+    })).then(function (lines) {
+      holder.style.setProperty('--wmax', Math.max.apply(null, lines.map(function (l) { return +l.style.getPropertyValue('--w'); })));
+      return lines;
+    }, function () {
+      holder.remove();
+      box.classList.remove('is-lettered');
+      text.classList.remove('sr-only');
+      return [];
+    });
   }
 
   // Full names can be long: shrink both script lines together until the longer one fits the arch
@@ -356,11 +400,58 @@
     }).observe(section);
   }
 
+  /* ------------------------------------------------------------- haptics */
+  // A short tick on phones that can vibrate (Android). Only once the guest has tapped the page: Chrome refuses
+  // vibrate() before that and logs a warning.
+  var canBuzz = !!navigator.vibrate && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function buzz(ms) {
+    if (canBuzz && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) navigator.vibrate(ms);
+  }
+
+  /* ---------------------------------------- tap the last page: petals */
+  // A short tap (not a scroll, not on a link) throws a handful of petals out from the finger; they drift down and go.
+  function PetalTaps(section) {
+    var down = null, kinds = ['petal-rose', 'petal-marigold', 'petal-rose', 'petal-marigold', 'leaf-gold'];
+    function petal(x, y, i, n) {
+      var p = document.createElement('img'), o = { k: 0 };
+      var a = i / n * 6.283 + Math.random() * 0.5, reach = 45 + Math.random() * 55;
+      var vx = Math.cos(a) * reach, vy = Math.sin(a) * reach * 0.75 - 30, fall = 90 + Math.random() * 60;
+      var turn = Math.random() * 360, spin = (Math.random() - 0.5) * 500;
+      p.className = 'tap-petal';
+      p.alt = '';
+      p.src = 'assets/img/' + kinds[i % kinds.length] + '.webp';
+      p.style.left = x + 'px';
+      p.style.top = y + 'px';
+      section.appendChild(p);
+      gsap.set(p, { xPercent: -50, yPercent: -50, scale: 0.7 + Math.random() * 0.5, rotation: turn });
+      gsap.to(o, {
+        k: 1, duration: 1.4 + Math.random() * 0.5, ease: 'none',
+        onUpdate: function () {   // thrown outwards and slowing, while falling ever faster
+          var k = o.k, out = 1 - (1 - k) * (1 - k);
+          gsap.set(p, { x: vx * out, y: vy * out + fall * k * k, rotation: turn + spin * k, autoAlpha: k < 0.6 ? 1 : (1 - k) / 0.4 });
+        },
+        onComplete: function () { p.remove(); }
+      });
+    }
+    section.addEventListener('pointerdown', function (e) {
+      down = e.isPrimary && e.button < 1 ? { x: e.clientX, y: e.clientY, t: performance.now() } : null;
+    }, { passive: true });
+    section.addEventListener('pointerup', function (e) {
+      var d = down;
+      down = null;
+      if (!d || Math.abs(e.clientX - d.x) + Math.abs(e.clientY - d.y) > 10 || performance.now() - d.t > 450) return;
+      if (e.target.closest && e.target.closest('a, button')) return;
+      var r = section.getBoundingClientRect();
+      for (var i = 0; i < 9; i++) petal(e.clientX - r.left, e.clientY - r.top, i, 9);
+      buzz(10);
+    });
+  }
+
   /* ------------------------------------------------------------ preloader */
   function preload(done) {
     var loader = $('.preloader');
     var urls = ['assets/img/seal.webp', 'assets/img/liner.webp', 'assets/img/card-paper.webp',
-      'assets/img/crest.webp', 'assets/img/arch.webp', portrait.matches ? 'assets/img/velvet-port.jpg' : 'assets/img/velvet-land.jpg'];
+      'assets/img/crest.webp', 'assets/img/arch.webp', 'assets/img/bismillah.webp', portrait.matches ? 'assets/img/velvet-port.jpg' : 'assets/img/velvet-land.jpg'];
     var total = urls.length + 1, n = 0, finished = false;
     function finish() {
       if (finished) return;
@@ -404,7 +495,7 @@
   };
 
   /* --------------------------------------------------------------- motion */
-  function buildMotion(media) {
+  function buildMotion(media, lettering) {
     gsap.registerPlugin(ScrollTrigger);
     ScrollTrigger.config({ ignoreMobileResize: true });
 
@@ -427,7 +518,7 @@
     var cue = $('.scroll-cue'), skip = $('.skip'), burst = $('.burst');
     var sEnv = $('.scene--envelope'), sInv = $('.scene--invite');
     var invBg = $('.invite-bg'), frame = $('.portal__frame'), arch = $('.arch'), spray = $('.spray');
-    var crest = $('.crest--invite'), hosts = $('.hosts'), namesEl = $('.names'), request = $('.request');
+    var bismillah = $('.bismillah'), hosts = $('.hosts'), namesEl = $('.names'), request = $('.request');
     var nOne = $('.names__one'), nTwo = $('.names__two'), amp = $('.names__amp');
     var invB = $('.invite-b'), namesSmall = $('.names-small'), mandala = $('.mandala');
     var florals = $$('.floral'), garlands = $$('.garland');
@@ -438,7 +529,7 @@
     var dots = [];
     for (var i = 0; i < 16; i++) { var d = document.createElement('i'); burst.appendChild(d); dots.push(d); }
 
-    var filmState = { p: 0 };
+    var filmState = { p: 0 }, lastT = 0;
     var tl = gsap.timeline({
       defaults: { ease: 'none' },
       scrollTrigger: {
@@ -451,6 +542,8 @@
         invalidateOnRefresh: true,
         onUpdate: function (self) {
           var t = self.progress * TOTAL;
+          if (t >= 0.33 && lastT < 0.33) buzz(14);   // the seal cracks (going forward only, like the sound cues)
+          lastT = t;
           envFloat.classList.toggle('is-still', t > 0.02);
           media.velvet.setActive(t < 3.4);
           if (t > 0.4) media.venue.load();   // guest has started opening: fetch the venue film now
@@ -487,7 +580,7 @@
       .to(skip, { autoAlpha: 0, duration: 0.2 }, 3.05)
       .to(sEnv, { autoAlpha: 0, duration: 0.15 }, 3.3);
 
-    /* Page 2, beat A: the arch settles, florals gather, names are written in */
+    /* Page 2, beat A: the arch settles, florals gather, the Bismillah and the names are written in */
     // The garlands drop in tilted, then swing straight. The tilt is set before the timeline, not as a
     // second from-state: the drop's from() restores the transform it saved when it starts, which wiped
     // a tilt added after it, so they fell straight on the way down and tilted on the way back up.
@@ -497,7 +590,7 @@
       .from(garlands, { yPercent: -105, ease: 'power2.out', duration: 0.7, stagger: 0.08 }, 3.55)
       .to(garlands, { rotation: 0, ease: 'elastic.out(1, 0.35)', duration: 0.9, stagger: 0.08 }, 3.95)
       .from(spray, { y: 40, autoAlpha: 0, scale: 0.92, ease: 'power2.out', duration: 0.6 }, 3.7)
-      .from(crest, { autoAlpha: 0, scale: 0.85, ease: 'power2.out', duration: 0.45 }, 3.85)
+      .fromTo(bismillah, { '--reveal': 0 }, { '--reveal': 1, ease: 'power1.inOut', duration: 0.5 }, 3.7)
       .from(hosts, { autoAlpha: 0, y: 14, ease: 'power2.out', duration: 0.4 }, 3.95)
       .fromTo(nOne, { '--reveal': 0 }, { '--reveal': 1, ease: 'power1.inOut', duration: 0.55 }, 4.1)
       .from(amp, { autoAlpha: 0, scale: 0.5, rotation: -12, ease: 'back.out(2)', duration: 0.35 }, 4.5)
@@ -505,16 +598,19 @@
       .from(request, { autoAlpha: 0, y: 14, ease: 'power2.out', duration: 0.4 }, 4.95)
       .addLabel('invite', 5.4);
 
-    /* Beat B: the date rolls in over a turning mandala */
-    tl.to([crest, hosts, request], { autoAlpha: 0, y: -18, ease: 'power2.in', duration: 0.4, stagger: 0.04 }, 5.8)
+    /* Beat B: a gold mandala is drawn round, the date rolls in and catches the light */
+    tl.to([bismillah, hosts, request], { autoAlpha: 0, y: -18, ease: 'power2.in', duration: 0.4, stagger: 0.04 }, 5.8)
       .to(namesEl, { autoAlpha: 0, scale: 0.6, y: function () { return -0.2 * frame.offsetWidth; }, ease: 'power2.inOut', duration: 0.5 }, 5.85)
       .from(namesSmall, { autoAlpha: 0, y: 24, ease: 'power2.out', duration: 0.45 }, 6.15)
       .from(mandala, { autoAlpha: 0, scale: 0.6, rotation: -40, ease: 'power2.out', duration: 0.8 }, 6.0)
+      .fromTo(mandala, { '--sweep': 0 }, { '--sweep': 1, ease: 'power1.inOut', duration: 1.1 }, 6.0)
       .to(mandala, { rotation: 70, duration: 2.4 }, 6.8)
       .from('.date__weekday', { autoAlpha: 0, y: 10, ease: 'power2.out', duration: 0.35 }, 6.25)
       .from('.date__day', { autoAlpha: 0, duration: 0.2 }, 6.3);
     $$('.date__digit > span').forEach(function (col, i) {
-      tl.fromTo(col, { yPercent: 0 }, { yPercent: +col.dataset.end, ease: 'power3.out', duration: 0.75 }, 6.3 + i * 0.12);
+      tl.fromTo(col, { yPercent: 0 }, { yPercent: +col.dataset.end, ease: 'power3.out', duration: 0.75 }, 6.3 + i * 0.12)
+        // a glint crosses each digit as it settles: the foil is drawn at twice the width, so sliding it moves the highlight
+        .fromTo(col.children, { backgroundPosition: '100% 0' }, { backgroundPosition: '0% 0', ease: 'power1.inOut', duration: 0.6 }, 6.95 + i * 0.12);
     });
     tl.from('.date__month', { autoAlpha: 0, y: 10, ease: 'power2.out', duration: 0.35 }, 6.7)
       .from('.date__time', { autoAlpha: 0, y: 10, ease: 'power2.out', duration: 0.35 }, 6.85)
@@ -546,10 +642,20 @@
       .to(vCard, { autoAlpha: 0, y: -30, ease: 'power2.in', duration: 0.4 }, 13.0)
       .set({}, {}, TOTAL);
 
-    /* Page 4: the blessing is written in, right to left, as the page arrives */
-    gsap.fromTo('.calligraphy__text', { '--reveal': 0 }, {
-      '--reveal': 1, ease: 'none',
-      scrollTrigger: { trigger: '.calligraphy', start: 'top 88%', end: 'top 38%', scrub: debug ? true : 0.6 }
+    /* Page 4: the couple's portrait rises into place as the page arrives */
+    gsap.from('.portrait', {
+      autoAlpha: 0, y: 40, scale: 0.94, ease: 'power2.out',
+      scrollTrigger: { trigger: '.portrait', start: 'top 98%', end: 'top 55%', scrub: debug ? true : 0.6 }
+    });
+
+    /* Then the blessing is written in, right to left: line by line when it is hand-lettered,
+       each line taking as long as it is wide, so the pen keeps one speed */
+    lettering.then(function (lines) {
+      var write = gsap.timeline({ scrollTrigger: { trigger: '.calligraphy', start: 'top 88%', end: 'top 38%', scrub: debug ? true : 0.6 } });
+      if (!lines.length) write.fromTo('.calligraphy__text', { '--reveal': 0 }, { '--reveal': 1, ease: 'none' });
+      lines.forEach(function (line) {
+        write.fromTo(line, { '--reveal': 0 }, { '--reveal': 1, ease: 'none', duration: line.style.getPropertyValue('--w') / 1000 });
+      });
     });
     gsap.fromTo('.calligraphy__halo', { rotation: -35 }, {
       rotation: 35, ease: 'none',
@@ -604,6 +710,7 @@
 
   /* ----------------------------------------------------------------- boot */
   fillContent();
+  var lettering = letterBlessing();
   countdown();
 
   var M = window.InviteMedia, S = window.InviteSound;
@@ -620,7 +727,8 @@
   if (motion) {
     media.dust = Dust($('.dust'));
     Petals($('.petals'), $('.blessing'));
-    controller = buildMotion(media);
+    PetalTaps($('.blessing'));
+    controller = buildMotion(media, lettering);
   }
 
   var fitTimer;
