@@ -21,7 +21,7 @@ https://ssanjan123.github.io/wedding-invitation/holud/. A painted kula holds a c
 thread; a swipe of turmeric paste writes the names; a palm drawn in henna lines holds the date; a curtain of
 marigold strings parts onto the holud stage; the last page asks guests to come dressed in holud and links to the
 wedding invitation. Guests can tap the swipe page to leave a dab of holud. When it loads, guests choose
-"Open with sound" or "Open quietly": with sound, a dhol-and-flute tune, the room, the thread, the turmeric swipe,
+"Open with sound" or "Open without sound": with sound, a dhol-and-flute tune, the room, the thread, the turmeric swipe,
 the marigold curtain and a cheer from the hall follow the story (`sound: false` in `holud/js/config.js` turns it off).
 
 Edit its wording in `holud/js/config.js`, and its link-preview tags at the top of `holud/index.html`.
@@ -33,7 +33,7 @@ Add `?to=` to the address to write a guest's name on the envelope:
 `https://your-site/index.html?to=Sarah%20%26%20Tom` shows "For Sarah & Tom".
 
 ## Sound
-When the invitation has loaded, guests choose **Open with sound** or **Open quietly**. With sound on, music
+When the invitation has loaded, guests choose **Open with sound** or **Open without sound**. With sound on, music
 plays and rises and dips with the story, the venue film gets a fountain in the background, and small sounds
 mark the moments (the wax seal cracking, the flap, the card, the names, the date, the doorway). A round button
 in the corner turns sound on and off. To switch it off entirely, set `sound: false` in `js/config.js`.

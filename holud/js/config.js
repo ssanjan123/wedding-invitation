@@ -69,6 +69,6 @@ window.INVITE = {
   },
 
   // Music, ambience and sound effects (the files are in holud/assets/audio, the timings in holud/js/main.js).
-  // Guests choose "Open with sound" or "Open quietly" when the page has loaded. false turns all sound off.
+  // Guests choose "Open with sound" or "Open without sound" when the page has loaded. false turns all sound off.
   sound: true
 };

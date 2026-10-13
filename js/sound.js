@@ -208,7 +208,7 @@ window.InviteSound = (function () {
     };
   }
 
-  /* The choice after loading: "Open with sound" / "Open quietly". Both open the invitation; the first also
+  /* The choice after loading: "Open with sound" / "Open without sound". Both open the invitation; the first also
      turns sound on (it has to happen inside the tap). Without a sound engine the page just opens. */
   function gate(loader, sound, open) {
     var choice = loader && loader.querySelector('.preloader__choice');

@@ -113,7 +113,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   transition: stroke-dashoffset .5s ease;
 }
 .is-ready .preloader { opacity: 0; visibility: hidden; }
-/* once loaded: "Open with sound" / "Open quietly" below the ring */
+/* once loaded: "Open with sound" / "Open without sound" below the ring */
 .preloader__choice {
   position: absolute; left: 0; right: 0; top: calc(50% + 124px);
   display: flex; flex-wrap: wrap; justify-content: center; gap: 12px 14px;

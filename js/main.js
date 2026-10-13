@@ -638,7 +638,7 @@
     if (debug && motion) media.venue.load();
     if (S) S.toggle($('.music'), sound);
   }
-  // once loaded, guests choose "Open with sound" or "Open quietly" (test links skip the question)
+  // once loaded, guests choose "Open with sound" or "Open without sound" (test links skip the question)
   preload(function () {
     if (S) S.gate($('.preloader'), debug ? null : sound, open);
     else open();
