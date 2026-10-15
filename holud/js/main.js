@@ -112,7 +112,9 @@
     var sw = (C.dress && C.dress.swatches) || [];
     $$('[data-swatches] span').forEach(function (el, i) { if (sw[i]) el.textContent = sw[i]; });
 
+    // every holud guest is a wedding guest: keep their name, and &holud makes the wedding page link back here
     if (!C.wedding || !C.wedding.url) $('[data-wedding]').hidden = true;
+    else $('[data-wedding] a').href = C.wedding.url + '?' + (to ? 'to=' + encodeURIComponent(to) + '&' : '') + 'holud';
 
     calendarLinks();
   }

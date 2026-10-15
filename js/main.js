@@ -92,6 +92,11 @@
       guestLine.textContent = C.guestLine.replace('{name}', guest);
       guestLine.hidden = false;
     }
+    // guests invited to the holud too (&holud on their link): a card at the end opens it, with their name
+    if (params.has('holud') && C.holud && C.holud.url) {
+      $('[data-holud-link]').href = C.holud.url + (to ? '?to=' + encodeURIComponent(to) : '');
+      $('[data-holud]').hidden = false;
+    }
 
     document.title = names + ' are getting married';
     $('[data-day]').textContent = String(start.getUTCDate());

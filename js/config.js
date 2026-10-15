@@ -3,6 +3,7 @@
 
   Personal links: add ?to=Name to the address to write a guest's name on the envelope,
   e.g.  https://your-site/index.html?to=Sarah%20%26%20Tom   ->  "For Sarah & Tom"
+  Guests invited to the Gaye Holud as well get &holud on the end of their link, which adds the `holud` card below.
 
   Link previews (WhatsApp, iMessage) read the <meta> tags at the top of index.html,
   not this file, so update the names and date there too.
@@ -60,6 +61,17 @@ window.INVITE = {
   families: "and their families",
   // Only on personal links (?to=): {name} is the guest's name.
   guestLine: "We hope to see you there, {name}.",
+
+  // Only on links ending in &holud: a card at the very end that opens the holud invitation, with the guest's name.
+  // Keep `when` and `where` in step with holud/js/config.js.
+  holud: {
+    lead: "You are also invited to our",
+    name: "Gaye Holud",
+    when: "Thursday 24 December 2026, 7 pm",
+    where: "Shimanto Convention Centre, Dhaka",
+    label: "Open the Gaye Holud invitation",
+    url: "holud/"
+  },
 
   // Music, ambience and sound effects (the files are in assets/audio, the timings in js/main.js).
   // Guests choose "Open with sound" or "Open without sound" when the page has loaded. false turns all sound off.

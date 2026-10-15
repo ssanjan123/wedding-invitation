@@ -671,6 +671,19 @@ html:not(.motion) .scene--venue { min-height: 100svh; }
 .save-date a:hover { text-decoration-color: var(--maroon-700); }
 .save-date i { width: 5px; height: 5px; rotate: 45deg; background: var(--gold-600); }
 
+/* only on links with &holud: the Gaye Holud, for guests invited to both */
+.also { width: min(100%, 30rem); margin-top: 12px; display: flex; flex-direction: column; align-items: center; }
+.also[hidden] { display: none; }
+.also__lead { font-style: italic; font-size: 19px; color: var(--maroon-700); }
+.also__name {
+  font-family: var(--script); font-size: clamp(40px, 5.4vw, 52px); line-height: 1.25;
+  padding: 0 .3em;
+  background-image: var(--foil-deep);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.also__when { margin-top: 2px; font-size: 18px; line-height: 1.5; color: var(--ink); text-wrap: balance; }
+.also .btn { margin-top: 20px; gap: .4em; }
+
 .blessing__footer { position: relative; z-index: 2; margin-top: auto; padding: 44px 0 max(18px, env(safe-area-inset-bottom)); }
 .blessing__footer img { width: min(440px, 86vw); height: auto; }
 

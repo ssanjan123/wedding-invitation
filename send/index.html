@@ -45,6 +45,7 @@
     }
     .events input { accent-color: var(--emerald); margin: 0; }
     .events label:has(input:checked) { border-color: var(--emerald); background: #E4EFE9; }
+    .events + .hint { margin: 10px 0 0; }
 
     .bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 14px; margin-bottom: 10px; }
     .count { color: var(--muted); font-size: 14px; }
@@ -95,9 +96,11 @@
   <section>
     <h2>Which invitation</h2>
     <div class="events" role="radiogroup">
-      <label><input type="radio" name="event" value="wedding" checked> Wedding</label>
+      <label><input type="radio" name="event" value="both" checked> Wedding + Gaye Holud</label>
+      <label><input type="radio" name="event" value="wedding"> Wedding only</label>
       <label><input type="radio" name="event" value="holud"> Gaye Holud</label>
     </div>
+    <p class="hint" id="event-hint"></p>
   </section>
 
   <section>
@@ -130,13 +133,22 @@
 (function () {
   'use strict';
 
+  // `extra` goes on the end of each link: &holud adds the Gaye Holud card to the end of the wedding page
   var EVENTS = {
+    both: {
+      url: new URL('../', location.href).href,
+      extra: '&holud',
+      hint: 'Opens on the wedding invitation, which ends with the Gaye Holud and a button to its invitation.',
+      message: 'Assalamu alaikum {name},\n\nWe would be honoured to have you with us at our Gaye Holud and our wedding. Your invitation to both is here:\n{link}\n\nWith love,\nWahid & Anushka'
+    },
     wedding: {
       url: new URL('../', location.href).href,
+      hint: 'The wedding only: the Gaye Holud is not mentioned.',
       message: 'Assalamu alaikum {name},\n\nWe would be honoured to have you at our wedding. Your invitation is here:\n{link}\n\nWith love,\nWahid & Anushka'
     },
     holud: {
       url: new URL('../holud/', location.href).href,
+      hint: 'Opens on the Gaye Holud invitation, which ends with a button to the wedding invitation.',
       message: 'Assalamu alaikum {name},\n\nCome and celebrate our Gaye Holud with us! Your invitation is here:\n{link}\n\nWith love,\nWahid & Anushka'
     }
   };
@@ -150,7 +162,7 @@
     var s = null;
     try { s = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
     s = s && typeof s === 'object' ? s : {};
-    s.event = EVENTS[s.event] ? s.event : 'wedding';
+    s.event = EVENTS[s.event] ? s.event : 'both';
     s.guests = s.guests || {};
     s.messages = s.messages || {};
     s.sent = s.sent || {};
@@ -186,7 +198,7 @@
     return d;
   }
 
-  function linkFor(name) { return EVENTS[state.event].url + '?to=' + encodeURIComponent(name); }
+  function linkFor(name) { return EVENTS[state.event].url + '?to=' + encodeURIComponent(name) + (EVENTS[state.event].extra || ''); }
   function sentKey(g) { return g.name.toLowerCase() + '|' + waNumber(g.phone); }
   function message() { return state.messages[state.event] != null ? state.messages[state.event] : EVENTS[state.event].message; }
 
@@ -282,6 +294,7 @@
 
   function showEvent() {
     document.querySelector('input[name=event][value=' + state.event + ']').checked = true;
+    $('#event-hint').textContent = EVENTS[state.event].hint;
     guestsEl.value = state.guests[state.event] || '';
     messageEl.value = message();
     render();

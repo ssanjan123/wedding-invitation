@@ -228,6 +228,15 @@
           <i aria-hidden="true"></i>
           <a data-gcal href="#" target="_blank" rel="noopener">Add to Google Calendar</a>
         </p>
+
+        <!-- Only on links with &holud: guests invited to the Gaye Holud too -->
+        <div class="also" data-holud hidden>
+          <div class="rule" aria-hidden="true"><i></i></div>
+          <p class="also__lead" data-bind="holud.lead">You are also invited to our</p>
+          <p class="also__name" data-bind="holud.name">Gaye Holud</p>
+          <p class="also__when"><span data-bind="holud.when">Thursday 24 December 2026, 7 pm</span><br><span data-bind="holud.where">Shimanto Convention Centre, Dhaka</span></p>
+          <a class="btn btn--gold" data-holud-link href="holud/"><span data-bind="holud.label">Open the Gaye Holud invitation</span> <span aria-hidden="true">→</span></a>
+        </div>
       </div>
 
       <footer class="blessing__footer">
