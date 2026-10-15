@@ -142,20 +142,6 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 }
 .skip:hover { text-decoration-color: var(--gold-300); }
 html:not(.motion) .skip { display: none; }
-/* only on links with &holud: opens the holud invitation from anywhere, in Skip's place once the envelope has opened.
-   Quiet, like the sound button: it is there when wanted without competing with the story. No backdrop-filter (it sits over the film). */
-.holud-pill {
-  position: absolute; top: max(14px, env(safe-area-inset-top)); right: var(--gutter);
-  pointer-events: auto;
-  display: inline-flex; align-items: center; gap: .35em;
-  min-height: 36px; padding: 5px 14px;
-  border-radius: 999px; border: 1px solid rgba(241, 217, 138, .5);
-  background: rgba(28, 4, 8, .8);
-  font-style: italic; font-size: 16px; letter-spacing: .01em; color: var(--gold-300); text-decoration: none;
-  transition: background-color .25s ease;
-}
-.holud-pill:hover { background: rgba(28, 4, 8, .92); }
-.holud-pill[hidden] { display: none; }
 .music {
   position: absolute; right: var(--gutter); bottom: max(16px, env(safe-area-inset-bottom));
   pointer-events: auto;
@@ -685,18 +671,72 @@ html:not(.motion) .scene--venue { min-height: 100svh; }
 .save-date a:hover { text-decoration-color: var(--maroon-700); }
 .save-date i { width: 5px; height: 5px; rotate: 45deg; background: var(--gold-600); }
 
-/* only on links with &holud: the Gaye Holud, for guests invited to both */
-.also { width: min(100%, 30rem); margin-top: 12px; display: flex; flex-direction: column; align-items: center; }
-.also[hidden] { display: none; }
-.also__lead { font-style: italic; font-size: 19px; color: var(--maroon-700); }
-.also__name {
-  font-family: var(--script); font-size: clamp(40px, 5.4vw, 52px); line-height: 1.25;
-  padding: 0 .3em;
-  background-image: var(--foil-deep);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
+/* Only on links with &holud: the Gaye Holud, for guests invited to both. A turmeric card in the holud page's colours,
+   arched like its kula: a vermilion band dotted with rice paste, a marigold garland round the arch
+   (holud-garland.svg, made by assets/raw/holud-card/garland.js), an alpona lotus and a clay lamp at each foot.
+   Sizes are in cqw of .also. The arch is half an ellipse 100cqw wide and 42cqw tall, which the garland's flowers follow. */
+.also {
+  --bw: 9px;
+  container-type: inline-size;
+  width: min(100%, 420px); margin-top: 64px;
 }
-.also__when { margin-top: 2px; font-size: 18px; line-height: 1.5; color: var(--ink); text-wrap: balance; }
-.also .btn { margin-top: 20px; gap: .4em; }
+.also[hidden] { display: none; }
+.also__card {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 16cqw 6.5cqw 0;
+  border: var(--bw) solid #B3261E;
+  border-radius: 50% 50% 20px 20px / 42cqw 42cqw 20px 20px;
+  background:
+    radial-gradient(circle, rgba(179, 38, 30, .16) 0 1px, transparent 1.6px) 0 0 / 13px 13px,
+    radial-gradient(120% 75% at 50% 35%, #FCDC7E 0%, #F4BB35 58%, #E59F12 100%);
+  box-shadow: inset 0 0 0 2px #1E3F20, inset 0 0 0 5px rgba(255, 248, 234, .5), 0 24px 44px -20px rgba(107, 52, 16, .6);
+  color: #1E3F20;
+}
+/* rice-paste dots along the vermilion band */
+.also__card::before {
+  content: ""; position: absolute; inset: calc(var(--bw) / -2 - 1.5px);
+  border: 3px dotted rgba(255, 248, 234, .95); border-radius: inherit;
+  pointer-events: none;
+}
+.also__garland {
+  position: absolute; left: calc(-4cqw - var(--bw)); top: calc(-4cqw - var(--bw));
+  width: 108cqw; max-width: none; height: 68cqw;
+  pointer-events: none;
+}
+.also__lead { font-style: italic; font-size: 18px; }
+.also__bangla {
+  font-family: "Galada", "Noto Serif Bengali", cursive; font-size: clamp(44px, 14cqw, 62px); line-height: 1.3;
+  color: #B3261E; text-shadow: 0 2px 0 rgba(255, 248, 234, .55);
+}
+.also__name { font-size: 14px; font-weight: 600; letter-spacing: .26em; text-transform: uppercase; color: #2F6B2F; }
+.also__when { margin-top: 12px; font-size: 18px; line-height: 1.5; font-weight: 500; text-wrap: balance; }
+.also__btn {
+  margin-top: 20px;
+  display: inline-flex; align-items: center; justify-content: center; gap: .4em;
+  min-height: 48px; padding: 10px clamp(14px, 5cqw, 24px); border-radius: 999px; white-space: nowrap;
+  background: #1E3F20; color: #FFF8EA;
+  font-size: clamp(15px, 4.6cqw, 18px); font-weight: 500; letter-spacing: .02em; text-decoration: none;
+  box-shadow: inset 0 0 0 1px rgba(246, 206, 91, .55), 0 10px 24px -12px rgba(14, 36, 21, .8);
+  transition: transform .25s ease, background-color .25s ease;
+}
+.also__btn:hover { transform: translateY(-1px); background: #2F6B2F; }
+.also__alpona { width: min(62%, 220px); height: auto; margin: 20px 0 22px; }
+
+.also__defs { position: absolute; width: 0; height: 0; }
+.also__lamp { position: absolute; bottom: -24px; width: clamp(58px, 19cqw, 80px); height: auto; pointer-events: none; }
+.also__lamp--l { left: -12px; }
+.also__lamp--r { right: -12px; }
+.also__flame { transform-box: fill-box; transform-origin: 50% 100%; animation: also-flicker 1.9s ease-in-out infinite alternate; }
+.also__glow { animation: also-glow 1.9s ease-in-out infinite alternate; }
+.also__lamp--r .also__flame, .also__lamp--r .also__glow { animation-duration: 2.3s; animation-delay: -.8s; }
+@keyframes also-flicker {
+  0% { transform: scale(1, 1) skewX(0); }
+  35% { transform: scale(.94, 1.07) skewX(-3deg); }
+  70% { transform: scale(1.04, .95) skewX(2deg); }
+  100% { transform: scale(.98, 1.03) skewX(-1deg); }
+}
+@keyframes also-glow { from { opacity: .7; } to { opacity: 1; } }
 
 .blessing__footer { position: relative; z-index: 2; margin-top: auto; padding: 44px 0 max(18px, env(safe-area-inset-bottom)); }
 .blessing__footer img { width: min(440px, 86vw); height: auto; }

@@ -21,10 +21,10 @@
   <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Imperial+Script&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Galada&family=Imperial+Script&display=swap">
   <link rel="preload" as="image" href="assets/img/seal.webp">
   <link rel="preload" as="image" href="assets/img/card-paper.webp">
-  <link rel="stylesheet" href="css/style.css?v=1">
+  <link rel="stylesheet" href="css/style.css?v=2">
   <script>document.documentElement.classList.add('js', matchMedia('(prefers-reduced-motion: reduce)').matches ? 'still' : 'motion');</script>
 </head>
 <body>
@@ -46,7 +46,6 @@
 
   <div class="controls">
     <button class="skip" type="button">Skip to the invitation</button>
-    <a class="holud-pill" data-holud data-holud-link href="holud/" hidden><span data-bind="holud.pill">Gaye Holud invitation</span> <span aria-hidden="true">→</span></a>
     <button class="music" type="button" aria-pressed="false" hidden>
       <span class="sr-only">Sound</span>
       <svg viewBox="0 0 24 24" aria-hidden="true"><path class="music__on" d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/><path class="music__off" d="M4 4l16 16"/></svg>
@@ -230,13 +229,45 @@
           <a data-gcal href="#" target="_blank" rel="noopener">Add to Google Calendar</a>
         </p>
 
-        <!-- Only on links with &holud: guests invited to the Gaye Holud too -->
+        <!-- Only on links with &holud: guests invited to the Gaye Holud too. A turmeric card with a marigold arch,
+             between two clay lamps, in the holud page's colours. -->
         <div class="also" data-holud hidden>
-          <div class="rule" aria-hidden="true"><i></i></div>
-          <p class="also__lead" data-bind="holud.lead">You are also invited to our</p>
-          <p class="also__name" data-bind="holud.name">Gaye Holud</p>
-          <p class="also__when"><span data-bind="holud.when">Thursday 24 December 2026, 7 pm</span><br><span data-bind="holud.where">Shimanto Convention Centre, Dhaka</span></p>
-          <a class="btn btn--gold" data-holud-link href="holud/"><span data-bind="holud.label">Open the Gaye Holud invitation</span> <span aria-hidden="true">→</span></a>
+          <div class="also__card">
+            <img class="also__garland" src="assets/img/holud-garland.svg" alt="" loading="lazy">
+            <p class="also__lead" data-bind="holud.lead">You are also invited to our</p>
+            <p class="also__bangla" lang="bn" aria-hidden="true" data-bind="holud.bangla">গায়ে হলুদ</p>
+            <p class="also__name" data-bind="holud.name">Gaye Holud</p>
+            <p class="also__when"><span data-bind="holud.when">Thursday 24 December 2026, 7 pm</span><br><span data-bind="holud.where">Shimanto Convention Centre, Dhaka</span></p>
+            <a class="also__btn" data-holud-link href="holud/"><span data-bind="holud.label">Open the Gaye Holud invitation</span> <span aria-hidden="true">→</span></a>
+            <img class="also__alpona" src="assets/img/holud-alpona.svg" alt="" loading="lazy">
+          </div>
+          <svg class="also__defs" aria-hidden="true">
+            <radialGradient id="hl-glow"><stop offset="0" stop-color="#FFD66B" stop-opacity=".8"/><stop offset=".55" stop-color="#FFB534" stop-opacity=".25"/><stop offset="1" stop-color="#FFB534" stop-opacity="0"/></radialGradient>
+            <linearGradient id="hl-flame" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#FFF6D6"/><stop offset=".45" stop-color="#FFC93C"/><stop offset="1" stop-color="#E8650C"/></linearGradient>
+            <linearGradient id="hl-clay" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B9562A"/><stop offset="1" stop-color="#6E2A10"/></linearGradient>
+          </svg>
+          <svg class="also__lamp also__lamp--l" viewBox="0 0 64 72" aria-hidden="true">
+            <circle class="also__glow" cx="32" cy="24" r="24" fill="url(#hl-glow)"/>
+            <g class="also__flame"><path d="M32 5C37 15 40 22 36 29C34 32 30 32 28 29C24 22 27 15 32 5Z" fill="url(#hl-flame)"/><ellipse cx="32" cy="26" rx="2.4" ry="4" fill="#FFFBEA"/></g>
+            <path d="M32 31V37" stroke="#3A1A08" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M4 40Q32 34 60 40Q56 62 32 64Q8 62 4 40Z" fill="url(#hl-clay)"/>
+            <ellipse cx="32" cy="40" rx="28" ry="5" fill="#7A2E10"/>
+            <ellipse cx="32" cy="40" rx="23" ry="3.2" fill="#D99A12"/>
+            <path d="M10 49Q32 55 54 49" stroke="#F6CE5B" stroke-width="1.8" fill="none"/>
+            <g fill="#FFF8EA"><circle cx="16" cy="55" r="1.2"/><circle cx="24" cy="58" r="1.2"/><circle cx="32" cy="59" r="1.4"/><circle cx="40" cy="58" r="1.2"/><circle cx="48" cy="55" r="1.2"/></g>
+            <ellipse cx="32" cy="66" rx="13" ry="3.2" fill="#5A220C"/>
+          </svg>
+          <svg class="also__lamp also__lamp--r" viewBox="0 0 64 72" aria-hidden="true">
+            <circle class="also__glow" cx="32" cy="24" r="24" fill="url(#hl-glow)"/>
+            <g class="also__flame"><path d="M32 5C37 15 40 22 36 29C34 32 30 32 28 29C24 22 27 15 32 5Z" fill="url(#hl-flame)"/><ellipse cx="32" cy="26" rx="2.4" ry="4" fill="#FFFBEA"/></g>
+            <path d="M32 31V37" stroke="#3A1A08" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M4 40Q32 34 60 40Q56 62 32 64Q8 62 4 40Z" fill="url(#hl-clay)"/>
+            <ellipse cx="32" cy="40" rx="28" ry="5" fill="#7A2E10"/>
+            <ellipse cx="32" cy="40" rx="23" ry="3.2" fill="#D99A12"/>
+            <path d="M10 49Q32 55 54 49" stroke="#F6CE5B" stroke-width="1.8" fill="none"/>
+            <g fill="#FFF8EA"><circle cx="16" cy="55" r="1.2"/><circle cx="24" cy="58" r="1.2"/><circle cx="32" cy="59" r="1.4"/><circle cx="40" cy="58" r="1.2"/><circle cx="48" cy="55" r="1.2"/></g>
+            <ellipse cx="32" cy="66" rx="13" ry="3.2" fill="#5A220C"/>
+          </svg>
         </div>
       </div>
 
@@ -249,10 +280,10 @@
   <script src="vendor/gsap.min.js"></script>
   <script src="vendor/ScrollTrigger.min.js"></script>
   <script src="vendor/lenis.min.js"></script>
-  <script src="js/config.js?v=1"></script>
-  <script src="js/media.js?v=1"></script>
-  <script src="js/sound.js?v=1"></script>
-  <script src="js/pace.js?v=1"></script>
-  <script src="js/main.js?v=1"></script>
+  <script src="js/config.js?v=2"></script>
+  <script src="js/media.js?v=2"></script>
+  <script src="js/sound.js?v=2"></script>
+  <script src="js/pace.js?v=2"></script>
+  <script src="js/main.js?v=2"></script>
 </body>
 </html>

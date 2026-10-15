@@ -92,10 +92,10 @@
       guestLine.textContent = C.guestLine.replace('{name}', guest);
       guestLine.hidden = false;
     }
-    // guests invited to the holud too (&holud on their link): a button at the top and a card at the end open it, with their name
+    // guests invited to the holud too (&holud on their link): a card at the end opens it, with their name
     if (params.has('holud') && C.holud && C.holud.url) {
-      $$('[data-holud-link]').forEach(function (el) { el.href = C.holud.url + (to ? '?to=' + encodeURIComponent(to) : ''); });
-      $$('[data-holud]').forEach(function (el) { el.hidden = false; });
+      $('[data-holud-link]').href = C.holud.url + (to ? '?to=' + encodeURIComponent(to) : '');
+      $('[data-holud]').hidden = false;
     }
 
     document.title = names + ' are getting married';
@@ -517,7 +517,7 @@
     var env = $('.envelope'), envFloat = $('.env-float'), card = $('.card'), cardInner = $('.card__inner');
     var flap = $('.env-flap'), flapShadow = $('.env-flap-shadow'), seal = $('.seal'), halves = $$('.seal__half');
     var pocket = $('.env-pocket'), inside = $('.env-inside'), envShadow = $('.env-shadow');
-    var cue = $('.scroll-cue'), skip = $('.skip'), pill = $('.holud-pill'), burst = $('.burst');
+    var cue = $('.scroll-cue'), skip = $('.skip'), burst = $('.burst');
     var sEnv = $('.scene--envelope'), sInv = $('.scene--invite');
     var invBg = $('.invite-bg'), frame = $('.portal__frame'), arch = $('.arch'), spray = $('.spray');
     var bismillah = $('.bismillah'), basmalaPanel = $('.bismillah__panel'), basmalaInk = $('.bismillah__ink'), hosts = $('.hosts'), namesEl = $('.names'), request = $('.request');
@@ -580,7 +580,6 @@
         ease: 'power2.inOut', duration: 0.75
       }, 2.6)
       .to(skip, { autoAlpha: 0, duration: 0.2 }, 3.05)
-      .fromTo(pill, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2 }, 3.3)   // takes Skip's place (&holud links only)
       .to(sEnv, { autoAlpha: 0, duration: 0.15 }, 3.3);
 
     /* Page 2, beat A: the arch settles, florals gather, the Bismillah and the names are written in */

@@ -62,12 +62,11 @@ window.INVITE = {
   // Only on personal links (?to=): {name} is the guest's name.
   guestLine: "We hope to see you there, {name}.",
 
-  // Only on links ending in &holud: a card at the very end that opens the holud invitation, with the guest's name,
-  // and a `pill` button at the top right from the moment the envelope opens. Keep `when` and `where` in step with
-  // holud/js/config.js.
+  // Only on links ending in &holud: a turmeric card at the very end that opens the holud invitation, with the guest's
+  // name. "bangla" is set in the holud page's Galada face. Keep `when` and `where` in step with holud/js/config.js.
   holud: {
-    pill: "Gaye Holud invitation",
     lead: "You are also invited to our",
+    bangla: "গায়ে হলুদ",
     name: "Gaye Holud",
     when: "Thursday 24 December 2026, 7 pm",
     where: "Shimanto Convention Centre, Dhaka",
