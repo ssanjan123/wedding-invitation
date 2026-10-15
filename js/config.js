@@ -53,7 +53,7 @@ window.INVITE = {
 
   // A note from the couple. Each item is one paragraph.
   message: [
-    "Our story began with our families, and it continues with you. Every prayer, every kind word and every shared meal has helped bring us to this day.",
+    "Our story began in 2013, and it continues with you. Every prayer, every kind word and every shared meal has helped bring us to this day.",
     "As we begin our life together, we ask for your duas for barakah, patience and a home full of mercy, and we would be honoured to celebrate it with you."
   ],
   signoff: "With love,",
