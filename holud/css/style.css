@@ -388,7 +388,6 @@ html:not(.motion) .garland { display: none; }
 
 .dabs, .closing__dabs { position: absolute; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
 .dab { position: absolute; width: clamp(46px, 9vmin, 84px); height: auto; max-width: none; mix-blend-mode: multiply; }
-.dab-petal { position: absolute; width: 14px; height: auto; max-width: none; }
 
 /* Beat A: the swipe of holud and the names */
 .sheet {

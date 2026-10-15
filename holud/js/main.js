@@ -388,21 +388,6 @@
       if (sound) sound.play('dab');
       buzz(10);
       if (marks.length > 30) marks.shift().remove();
-      for (var i = 0; i < 5; i++) {
-        var p = document.createElement('img');
-        p.className = 'dab-petal';
-        p.alt = '';
-        p.src = WEDDING_IMG + (i % 3 ? 'petal-marigold' : 'petal-rose') + '.webp';
-        p.style.left = x + 'px';
-        p.style.top = y + 'px';
-        box.appendChild(p);
-        var a = i / 5 * 6.283 + Math.random();
-        gsap.fromTo(p, { xPercent: -50, yPercent: -50, x: 0, y: 0, rotation: 0, autoAlpha: 1 }, {
-          x: Math.cos(a) * (36 + Math.random() * 30), y: Math.sin(a) * (30 + Math.random() * 26) + 30,
-          rotation: (Math.random() - 0.5) * 300, autoAlpha: 0, duration: 0.9 + Math.random() * 0.4, ease: 'power2.out',
-          onComplete: p.remove.bind(p)
-        });
-      }
     });
   }
 
