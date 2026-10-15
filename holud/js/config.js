@@ -37,9 +37,9 @@ window.INVITE = {
 
   venue: {
     lead: "The holud will be held at",
-    name: "BGB Banquet Hall",
-    address: "Shimanto Shambhar, 4th floor, Road 2, Dhanmondi, Dhaka 1205",
-    mapsUrl: "https://www.google.com/maps/search/?api=1&query=BGB+Banquet+Hall%2C+Shimanto+Shambhar%2C+Road+2%2C+Dhanmondi%2C+Dhaka"
+    name: "Shimanto Convention Centre",
+    address: "4th Floor, Shimanto Square Market, 75 Road No. 2, Dhaka 1209",
+    mapsUrl: "https://www.google.com/maps/search/?api=1&query=Shimanto+Convention+Centre%2C+Shimanto+Square+Market%2C+75+Road+No.+2%2C+Dhaka+1209"
   },
 
   // Shown on the venue card. Leave the list empty to hide it.
@@ -50,8 +50,8 @@ window.INVITE = {
   dress: {
     bangla: "হলুদ",
     title: "Come dressed in holud",
-    note: "Yellow, marigold or green. The brighter, the better.",
-    swatches: ["Holud", "Genda", "Kolapata"]
+    note: "Yellow, marigold or purple. The brighter, the better.",
+    swatches: ["Holud", "Genda", "Beguni"]
   },
 
   // A note from the couple. Each item is one paragraph.

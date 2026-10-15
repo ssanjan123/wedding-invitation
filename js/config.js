@@ -24,7 +24,7 @@ window.INVITE = {
   request: "request the honour of your presence at their wedding",
 
   // Local time at the venue, 24-hour clock
-  start: "2026-12-27T18:00",
+  start: "2026-12-27T19:00",
   end: "2026-12-27T23:00",
   // Bangladesh time, so the countdown and calendar are right for guests anywhere
   utcOffset: "+06:00",

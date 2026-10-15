@@ -11,7 +11,7 @@ Edit `js/config.js`: names, initials, date and time, venue, schedule, the Arabic
 meaning and source, and the note from the couple (`message`, one entry per paragraph).
 The verse is drawn from a hand-lettered image (`blessing.lettered`); if you change the Arabic text, empty that list
 so the new text is shown instead (and update `translation` and `source`).
-The weekday, "six o'clock in the evening", the countdown and the calendar file are all worked out from `start`.
+The weekday, "seven o'clock in the evening", the countdown and the calendar file are all worked out from `start`.
 
 Link previews (WhatsApp, iMessage) read the `<meta>` tags at the top of `index.html`, so update the
 names and date there too. The preview picture is `assets/img/og-share.jpg`, with W & A in the seal.
