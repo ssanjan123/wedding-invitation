@@ -475,7 +475,7 @@
   // `still` is the level used without the scroll timeline (reduced motion).
   var SOUND = {
     beds: [
-      { url: 'assets/audio/music.mp3', still: 1,
+      { url: 'assets/audio/music.mp3?v=2', still: 1,
         curve: [[0, 0.55], [2.6, 0.55], [3.3, 0.9], [8.1, 0.9], [9.0, 0.45], [12.8, 0.45], [13.6, 0.9]] },
       { url: 'assets/audio/courtyard.mp3', still: 0,
         curve: [[8.3, 0], [9.3, 0.85], [12.6, 0.85], [13.6, 0]] }
